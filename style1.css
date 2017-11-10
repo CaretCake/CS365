@@ -1,0 +1,52 @@
+#header{
+	height: 45px;
+	width: 95%;
+	border: 1px solid black;
+	margin: auto;
+	margin-bottom: 25px;
+	border-box: box-size;
+	text-align: center;
+}
+
+#header h1{
+	margin:0;
+}
+
+.container{
+	display: flex;
+	justify-content: center;
+}
+
+#userList{
+	border: 1px solid black;
+	width: 20%;
+	height: 50px;
+	
+}
+
+#drawingContainer{
+	flex: 1 1 auto;
+	min-width: 300px;
+	overflow: hidden;
+	margin-left: 20px;
+	margin-right: 20px;
+}
+
+canvas{
+	border: 1px solid black;
+	width: 100%;
+	height: 50px;
+	box-sizing: border-box;
+}
+
+#chatBox{
+	border: 1px solid black;
+	width: 25%;
+	height: 50px;
+
+}
+
+
+
+
+//Canvas resizes
