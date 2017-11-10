@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
@@ -8,31 +9,43 @@
 		<script src="/socket.io/socket.io.js" type="text/javascript"></script>
 		<script src="client.js" type="text/javascript"></script>
 	</head>
+
 	<body>
-	<div id="header">
-		<h1>THIS IS THE HEADER OF THE GAME</h1>
-	</div>
+		<div class="center">
+			<header>
+				<h1>This is the Header of the Game</h1>
+			</header>
 
-	<div id="gameContainer">
-		<div id="timerBar">
-		</div>
+			<div class="screenContainer">
+				<div class="background" id="gameStatusBar">
+				</div>
 
-		<div class="container">
-			<div id="userList">
+				<div class="gameContainer">
+					<div class="background" id="userSidebar">
+						<ul class="userList">
+							<li>This is a user.</li>
+							<li>This is a user.</li>
+							<li>This is a user.</li>
+						</ul>
+						<button>Vote to Kick</button>
+					</div>
 
-			</div>
+					<div class="drawingContainer background">
+						<canvas>
+						</canvas>
 
-			<div id="drawingContainer">
-				<canvas>
-				</canvas>
+						<div class="toolbar">
+						</div>
 
-				<div id="toolBar">
+						<div id="toolBar background">
+						</div>
+					</div>
+
+					<div class="background" id="chatSidebar">
+						hello
+					</div>
 				</div>
 			</div>
-
-			<div id="chatBox">
-			</div>
 		</div>
-	</div>
 	</body>
 </html>
