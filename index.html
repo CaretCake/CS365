@@ -13,7 +13,7 @@
 	<body>
 		<div class="center">
 			<header>
-				<h1>This is the Header of the Game</h1>
+				<h1>Doodle Scribble Draw</h1>
 			</header>
 
 			<div class="screenContainer">
@@ -21,13 +21,14 @@
 				</div>
 
 				<div class="gameContainer">
-					<div class="background" id="userSidebar">
-						<ul class="userList">
-							<li>This is a user.</li>
-							<li>This is a user.</li>
-							<li>This is a user.</li>
-						</ul>
-						<button>Vote to Kick</button>
+					<div id="userSidebar">
+						<div id="userList" class="background">
+							<table id="users">
+							</table>
+						</div>
+						<div id="kickButton">
+							<button id="voteKick">Vote to Kick</button>
+						</div>
 					</div>
 
 					<div class="drawingContainer background">
@@ -42,7 +43,10 @@
 					</div>
 
 					<div class="background" id="chatSidebar">
-						hello
+						<textarea id="chatField" disabled="disabled"></textarea>
+
+						<input id="chatText" type="text" placeholder="Type your guess here...">
+						<button id="chatButton" type="button">Chat</button>
 					</div>
 				</div>
 			</div>
