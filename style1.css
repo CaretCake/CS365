@@ -11,10 +11,9 @@ header {
 	margin-bottom: 25px;
 	box-sizing: border-box;
 	text-align: center;
-	min-width: 880px;	
+	min-width: 880px;
 	width: 100%;
 }
-
 
 #gameStatusBar {
 	border: 1px solid black;
@@ -48,6 +47,7 @@ header h1{
 	display: flex;
 	justify-content: center;
 	height: 100%;
+	min-height: 426px;
 	border: 1px solid blue;
 	box-sizing: border-box;
 }
@@ -65,11 +65,58 @@ header h1{
 }
 
 #userSidebar{
-	border: 1px solid black;
-	height: 50px;
+	height: 100%;
 	width: 200px;
 	min-height: 426px;
 	box-sizing: border-box;
+}
+
+#userList{
+	border: 1px solid black;
+	width: 100%;
+	height: calc(100% - 35px);
+}
+
+#users{
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+}
+
+.playerNames, .playerScores{
+	min-width: 135px;
+	font-size: 12px;
+}
+
+#users tr:nth-child(2n + 1) {
+	background-color: rgb(230, 230, 230);
+}
+
+#users tr:nth-child(2n + 2) {
+	background-color: rgb(200, 200, 200);
+}
+
+.drawer{
+
+	min-width: 35px;
+}
+
+.pencil{
+	width: 35px;
+	height: 35px;
+}
+
+#kickButton{
+	width: 100%;
+	text-align: center;
+}
+
+#voteKick{
+	width: 100%;
+	border-radius: 4px;
+	height: 25px;
+	background-color: orange;
+	margin-top: 5px;
 }
 
 .drawingContainer{
@@ -95,5 +142,37 @@ canvas{
 	border: 1px solid black;
 	width: 340px;
 	height: 100%;
+	min-height: 426px;
 	box-sizing: border-box;
+}
+
+textarea {
+	resize: none;
+	width: 100%;
+	background-color: rgba(255, 255, 255, .6);
+	color: black;
+}
+
+#chatField {
+	width: calc(100% - 10px);
+	box-sizing: border-box;
+	margin: 10px 5px 0px 5px;
+	height: 92%;
+}
+
+#chatText {
+	width: calc(100% - 65px);
+	box-sizing: border-box;
+	margin-left: 5px;
+
+	float: left;
+}
+
+#chatButton {
+	width: 50px;
+	box-sizing: border-box;
+	float: right;
+	margin-right: 5px;
+	border-radius: 4px;
+	background-color: orange;
 }
