@@ -18,27 +18,96 @@
 
 			<div class="screenContainer">
 				<div class="background" id="gameStatusBar">
+					<div class="timer">
+						<img src="img/icon-timer.png" height="55" width="55" class="timer-icon">
+						<div class="text">90</div>
+					</div>
 				</div>
 
 				<div class="gameContainer">
 					<div id="userSidebar">
 						<div id="userList" class="background">
-							<table id="users">
+							<table class="no-selection" id="users">
 							</table>
 						</div>
 						<div id="kickButton">
-							<button id="voteKick">Vote to Kick</button>
+							<button class="button-background" id="voteKick">Vote to Kick</button>
 						</div>
 					</div>
 
-					<div class="drawingContainer background">
-						<canvas>
+					<div class="drawingContainer">
+						<canvas class="background no-selection" id="canvas">
 						</canvas>
 
-						<div class="toolbar">
-						</div>
+						<div class="toolBar">
+							<img src="img/black.png" alt="current color" height="40" width="40" class="left-margin border no-selection" id="current-color">
+							<table class="border">
+								<tr>
+									<td>
+									<img src="img/black.png" alt="color black" height="20" width="20" class="color no-selection" id="black">
+									</td>
+									<td>
+									<img src="img/dark-brown.png" alt="color dark brown" height="20" width="20" class="color no-selection" id="dark-brown">
+									</td>
+									<td>
+									<img src="img/light-brown.png" alt="color light brown" height="20" width="20" class="color no-selection" id="light-brown">
+									</td>
+									<td>
+									<img src="img/red.png" alt="color red" height="20" width="20" class="color no-selection" id="red">
+									</td>
+									<td>
+									<img src="img/pink.png" alt="color pink" height="20" width="20" class="color no-selection" id="pink">
+									</td>
+									<td>
+									<img src="img/dark-green.png" alt="color dark green" height="20" width="20" class="color no-selection" id="dark-green">
+									</td>
+									<td>
+									<img src="img/dark-blue.png" alt="color dark blue" height="20" width="20" class="color no-selection" id="dark-blue">
+									</td>
+									<td>
+									<img src="img/purple.png" alt="color purple" height="20" width="20" class="color no-selection" id="purple">
+									</td>
+								</tr>
+								<tr>
+									<td>
+									<img src="img/white.png" alt="color white" height="20" width="20" class="color no-selection" id="white">
+									</td>
+									<td>
+									<img src="img/grey.png" alt="color grey" height="20" width="20" class="color no-selection" id="grey">
+									</td>
+									<td>
+									<img src="img/beige.png" alt="color beige" height="20" width="20" class="color no-selection" id="beige">
+									</td>
+									<td>
+									<img src="img/orange.png" alt="color orange" height="20" width="20" class="color no-selection" id="orange">
+									</td>
+									<td>
+									<img src="img/yellow.png" alt="color yellow" height="20" width="20" class="color no-selection" id="yellow">
+									</td>
+									<td>
+									<img src="img/light-green.png" alt="color light green" height="20" width="20" class="color" id="light-green">
+									</td>
+									<td>
+									<img src="img/light-blue.png" alt="color light blue" height="20" width="20" class="color no-selection" id="light-blue">
+									</td>
+									<td>
+									<img src="img/lilac.png" alt="color lilac" height="20" width="20" class="color no-selection" id="lilac">
+									</td>
+								</tr>
+							</table>
 
-						<div id="toolBar background">
+
+							<img src="img/icon-smallbrush.png" alt="brush tool" height="30" width="30" title="small brush" class="tool left-margin-neg top-margin neg-margin no-selection" id="small-brush">
+							<img src="img/icon-medbrush.png" alt="brush tool" height="30" width="30" title="medium brush" class="tool top-margin no-selection" id="med-brush">
+							<img src="img/icon-largebrush.png" alt="brush tool" height="30" width="30" title="large brush" class="tool top-margin no-selection" id="large-brush">
+							
+							<img src="img/icon-draw.png" alt="brush tool" height="38" width="38" title="draw tool" class="tool left-margin button-background no-selection hvr-rotate button-on-click" id="brush-tool">
+							<img src="img/icon-rect.png" alt="rectangle tool" height="38" width="38" title="draw a rectangle" class="tool left-margin button-background no-selection hvr-rotate button-on-click" id="rect-tool">
+							<img src="img/icon-circle.png" alt="circle tool" height="38" width="38" title="draw a circle" class="tool left-margin button-background no-selection hvr-rotate button-on-click" id="circle-tool">
+							<img src="img/icon-eraser.png" alt="eraser tool" height="38" width="38" title="eraser tool" class="tool left-margin button-background no-selection hvr-rotate button-on-click" id="eraser-tool">
+							<img src="img/icon-clear.png" alt="clear drawing" height="38" width="38" title="clear your canvas" class="tool left-margin button-background no-selection hvr-rotate button-on-click" id="clear-canvas">
+
+
 						</div>
 					</div>
 
@@ -46,7 +115,7 @@
 						<textarea id="chatField" disabled="disabled"></textarea>
 
 						<input id="chatText" type="text" placeholder="Type your guess here...">
-						<button id="chatButton" type="button">Chat</button>
+						<button class="hvr-bubble-left button-background" id="chatButton" type="button">Chat</button>
 					</div>
 				</div>
 			</div>
