@@ -32,6 +32,26 @@ var canvas, ctx, flag = false,
 var color = "black",
     lineWidth = 8;
 
+function loadLogin(){
+	var wid = $(window).width();
+	var hei = $(window).height();
+
+	$("#loginOverlay").css("height", hei + 'px');
+	$("#box").css("left", (wid/2)-(550 * .5)+"px");
+}
+
+socket.on("loginBad", function(errorMessage){
+	$("#loginError").empty();
+	$("#loginError").append(errorMessage);
+	$("#userName").val("");
+	$("#userName").focus();
+});
+
+socket.on("loginOk", function(){
+	$("#loginOverlay").css("display", "none");
+	$("#box").css("display", "none");
+});
+
 function sanitizeForHTML(stringToConvert) {
 	stringToConvert = stringToConvert.replace(/&/g, "&amp;");
 	stringToConvert = stringToConvert.replace(/</g, "&lt;");
@@ -44,18 +64,21 @@ function sanitizeForHTML(stringToConvert) {
 }
 
 
-socket.on("updateUsers", function(playerList, playerScores){
-	$("#users").empty();
-	var th = $("<th colspan='3'>Game Players</th>");
-	$("#users").append(th);
-	for(var i = 0; i < playerList.length; i++){
+socket.on("updateUsers", function(players){
+	$("#userList").empty();
+	var th = $("<th colspan='3'>Players</th>");
+	$("#userList").append(th);
+	for(var i = 0; i < players.length; i++){
 		var tr = $("<tr></tr>");
 		var playerNum = i+1;
-		tr.append("<td class='playerRank' rowspan='2'>#" + playerNum + " </td>");
-		tr.append("<td class='playerNames'>" + playerList[i] + "</td>");
-		tr.append("<td class='drawer' rowspan='2'><img src='img/icon-draw.png' class='pencil'></td>");
-		$("#users").append(tr);
-		$("#users").append("<tr><td class='playerScores'>Score</td></tr>");
+		tr.append("<td class='playerRank' rowspan='2'>#" + players[i].rank + " </td>");
+		tr.append("<td class='playerNames'>" + sanitizeForHTML(players[i].name) + "</td>");
+		if(players[i].drawer)
+			tr.append("<td class='drawer' rowspan='2'><img src='imgs/pencil.png' class='pencil'></td>");
+		else
+			tr.append("<td rowspan='2'></td>");
+		$("#userList").append(tr);
+		$("#userList").append("<tr><td class='playerScore'>" + players[i].score + "</td></tr>");
 	}
 });
 
@@ -353,6 +376,16 @@ function startUp(){
 		changeBrushSize(30);
 	});
 
+	$("#userName").focus();
+	$("#login").click(function(){
+		socket.emit("login", $("#userName").val());
+	});
+	$("#userName").keypress(function(event) {
+		if (event.which == 13) {
+			socket.emit("login", $("#userName").val());
+			event.preventDefault();
+		}
+	});
 
 	$("#chatButton").click(sendChatToServer);
 	$("#chatText").keypress(function(event) {
@@ -361,6 +394,7 @@ function startUp(){
 			event.preventDefault();
 		}
 	});
+	loadLogin();
 }
 
 
