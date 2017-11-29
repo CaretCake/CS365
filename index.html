@@ -11,6 +11,22 @@
 	</head>
 
 	<body>
+		<div id="loginOverlay"></div>
+			<div id="box">
+				<div id="content">
+					<div id="boxhead">Please enter a username to join!</div>
+					<div id="boxbody">
+						<input type="text" id="userName" placeholder="Enter username">
+						<p id="loginError"></p>
+					</div>
+					<div id="boxfoot">
+						<button type="button" id="login">Login</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		
 		<div class="center">
 			<header>
 				<h1>Doodle Scribble Draw</h1>
@@ -26,8 +42,8 @@
 
 				<div class="gameContainer">
 					<div id="userSidebar">
-						<div id="userList" class="background">
-							<table class="no-selection" id="users">
+						<div id="userListBox" class="background">
+							<table class="no-selection" id="userList">
 							</table>
 						</div>
 						<div id="kickButton">
