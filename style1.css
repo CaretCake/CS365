@@ -5,6 +5,67 @@ html {
 	font-family: 'Source Sans Pro', sans-serif;
 }
 
+#loginOverlay{
+	display: block;
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	background-color: rgba(0,0,0,0.5);
+	width: 100%;
+	z-index: 10;
+}
+#box{
+	display: block;
+	position: fixed;
+	background-color: #000;
+	border-radius: 7px;
+	width: 550px;
+	z-index: 10;
+	top: 100px;
+}
+#content{
+	background-color: #FFF;
+	margin: 3px;
+}
+#boxhead{
+	background-color: #293241;
+	font-size: 19px;
+	padding 10px;
+	padding-top: 15px;
+	padding-bottom: 15px;
+	text-align: center;
+	color: white;
+}
+#boxbody{
+	background-color: #FFF;
+	padding: 20px;
+}
+#boxfoot{
+	background-color: #FFF;
+	padding: 10px;
+	text-align: right;
+}
+#login{
+    background-color: #EE6C4D;
+    border-radius: 8px;
+    color: white;
+    padding: 5px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+#login:hover{
+ background-color: white;
+ border: 2px solid #EE6C4D;
+ color: #EE6C4D;
+}
+#loginError{
+	color: #EE6C4D;
+	display: inline;
+}
+
+
 header {
 	height: 60px;
 	margin-bottom: 15px;
@@ -88,29 +149,41 @@ header h1{
 	box-sizing: border-box;
 }
 
-#userList{
+#userListBox{
 	width: 100%;
 	height: calc(100% - 35px);
 	border-radius: 4px;
 }
 
-#users{
+#usersList{
 	margin-left: auto;
 	margin-right: auto;
 	text-align: center;
+	border-collapse: collapse;
+}
+#userList td{
+	padding-left: 5px;
+	padding-right: 5px;
 }
 
-.playerNames, .playerScores{
-	min-width: 135px;
-	font-size: 12px;
-}
-
-#users tr:nth-child(2n + 1) {
+#userList tr:nth-child(4n + 1),
+	#userList tr:nth-child(4n + 4) {
 	background-color: rgb(230, 230, 230);
 }
 
-#users tr:nth-child(2n + 2) {
+#userList tr:nth-child(4n + 2),
+	#userList tr:nth-child(4n + 3) {
 	background-color: rgb(200, 200, 200);
+}
+
+.playerNames{
+	min-width: 135px;
+	font-size: 14px;
+}
+
+.playerScores{
+	min-width: 135px;
+	font-size: 8px;
 }
 
 .toolBar img {
@@ -287,6 +360,7 @@ textarea {
 	width: 100%;
 	background-color: rgba(255, 255, 255, .6);
 	color: black;
+	font-size: 14px;
 }
 
 #chatField {
