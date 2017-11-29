@@ -6,11 +6,13 @@ html {
 }
 
 header {
-	height: 45px;
-	border: 1px solid black;
-	margin-bottom: 25px;
+	height: 60px;
+	margin-bottom: 15px;
+	display: flex;
+	font-size: 25px;
 	box-sizing: border-box;
-	text-align: center;
+	align-items: center;
+	justify-content: center;
 	min-width: 880px;
 	width: 100%;
 }
@@ -37,10 +39,27 @@ header h1{
 	min-width: 880px;
 	display: flex;
 	flex-direction: column;
-	background-color: yellow;
+	background-color: #17D162;
 	position: absolute;
 	top: 0;
 	left: 0;
+}
+
+.timer {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.timer-icon {
+}
+
+.text {
+	left: 0;
+	text-align:center;
+	top: 30px;
+	width: 100%
 }
 
 .gameContainer{
@@ -48,7 +67,6 @@ header h1{
 	justify-content: center;
 	height: 100%;
 	min-height: 426px;
-	border: 1px solid blue;
 	box-sizing: border-box;
 }
 
@@ -59,7 +77,6 @@ header h1{
 	width: 100%;
 	flex-direction: column;
 	height: 650px;
-	border: 1px solid red;
 	min-width: 880px;
 	box-sizing: border-box;
 }
@@ -72,9 +89,9 @@ header h1{
 }
 
 #userList{
-	border: 1px solid black;
 	width: 100%;
 	height: calc(100% - 35px);
+	border-radius: 4px;
 }
 
 #users{
@@ -96,6 +113,122 @@ header h1{
 	background-color: rgb(200, 200, 200);
 }
 
+.toolBar img {
+	float: left;
+}
+
+.toolBar table {
+	float: left;
+	border-collapse: collapse;
+	margin-left: 2px;
+}
+
+.toolBar tr {
+	margin: 0;
+	padding: 0;
+	height: 20px;
+}
+
+.toolBar td img {
+	float: none;
+	margin: 0;
+	padding: 0;
+	vertical-align: top;
+}
+
+.toolBar td {
+	margin: 0;
+	padding: 0;
+	height: 20px;
+	width: 20px;
+}
+
+.left-margin {
+	margin-left: 5px;
+}
+
+.left-margin-neg {
+	margin-left: -3px;
+}
+
+.right-margin {
+	margin-right: 2px;
+}
+
+.top-margin {
+	margin-top: 5px;
+}
+
+.neg-margin {
+	margin-right: -9px;
+}
+
+.button-background {
+	background-color: #FF941C;
+	border: 2px outset #FF941C;
+	border-radius: 10px;
+	padding: 2px;
+}
+
+.button-on-click:active {
+	background-color: #1d91c3;
+	border:2px outset #1d91c3;
+	transition: background 0.1s linear;
+}
+
+.hvr-rotate {
+	display: inline-block;
+	vertical-align: middle;
+	-webkit-transform: perspective(1px) translateZ(0);
+	transform: perspective(1px) translateZ(0);
+	box-shadow: 0 0 1px transparent;
+	-webkit-transition-duration: 0.3s;
+	transition-duration: 0.3s;
+	-webkit-transition-property: transform;
+	transition-property: transform;
+}
+.hvr-rotate:hover, .hvr-rotate:focus, .hvr-rotate:active {
+	-webkit-transform: rotate(4deg);
+	transform: rotate(4deg);
+}
+
+.hvr-bubble-left {
+	display: inline-block;
+	vertical-align: middle;
+	-webkit-transform: perspective(1px) translateZ(0);
+	transform: perspective(1px) translateZ(0);
+	box-shadow: 0 0 1px transparent;
+	position: relative;
+}
+.hvr-bubble-left:before {
+  pointer-events: none;
+  position: absolute;
+  z-index: -1;
+  content: '';
+  border-style: solid;
+  -webkit-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+  -webkit-transition-property: transform;
+  transition-property: transform;
+  top: calc(50% - 10px);
+  left: 0;
+	border-width: 10px 10px 10px 0;
+	border-color: transparent #FF941C transparent transparent;
+}
+.hvr-bubble-left:hover:before, .hvr-bubble-left:focus:before, .hvr-bubble-left:active:before {
+	-webkit-transform: translateX(-10px);
+	transform: translateX(-10px);
+}
+
+/*.button-background {
+	
+}*/
+
+.border {
+	border: 1px solid #696969;
+	border-radius: 10px;
+}
+
 .drawer{
 
 	min-width: 35px;
@@ -115,35 +248,38 @@ header h1{
 	width: 100%;
 	border-radius: 4px;
 	height: 25px;
-	background-color: orange;
+	background-color: #FF941C;
 	margin-top: 5px;
 }
 
 .drawingContainer{
 	flex: 1 1 auto;
 	min-width: 300px;
-	max-width: 800px;
+	max-width: 602px;
 	overflow: hidden;
 	margin-left: 20px;
 	margin-right: 20px;
 	position: relative;
-	border: 1px solid green;
 	box-sizing: border-box;
 }
 
-canvas{
-	border: 1px solid black;
-	width: 100%;
-	height: 100%;
+.no-selection {
+	-webkit-user-select: none; /* prevent selection */       
+	-moz-user-select: none; /* prevent selection */
+	-ms-user-select: none; /* prevent selection */
+}
+
+#canvas {
 	box-sizing: border-box;
+	margin-bottom: 5px;
 }
 
 #chatSidebar{
-	border: 1px solid black;
 	width: 340px;
 	height: 100%;
 	min-height: 426px;
 	box-sizing: border-box;
+	border-radius: 4px;
 }
 
 textarea {
@@ -158,14 +294,18 @@ textarea {
 	box-sizing: border-box;
 	margin: 10px 5px 0px 5px;
 	height: 92%;
+	border-radius: 4px;
 }
 
 #chatText {
-	width: calc(100% - 65px);
+	width: calc(100% - 70px);
 	box-sizing: border-box;
 	margin-left: 5px;
-
 	float: left;
+	border-radius: 4px;
+	border: 1px solid lightgray;
+	height: 25px;
+	padding: 2px;
 }
 
 #chatButton {
@@ -174,5 +314,5 @@ textarea {
 	float: right;
 	margin-right: 5px;
 	border-radius: 4px;
-	background-color: orange;
+	background-color: #FF941C;
 }
