@@ -37,7 +37,7 @@ function loadLogin(){
 	var hei = $(window).height();
 
 	$("#loginOverlay").css("height", hei + 'px');
-	$("#box").css("left", (wid/2)-(550 * .5)+"px");
+	$("#box").css("left", (wid/2)-(600 * .5)+"px");
 }
 
 socket.on("loginBad", function(errorMessage){
@@ -74,12 +74,30 @@ socket.on("updateUsers", function(players){
 		tr.append("<td class='playerRank' rowspan='2'>#" + players[i].rank + " </td>");
 		tr.append("<td class='playerNames'>" + sanitizeForHTML(players[i].name) + "</td>");
 		if(players[i].drawer)
-			tr.append("<td class='drawer' rowspan='2'><img src='imgs/pencil.png' class='pencil'></td>");
+			tr.append("<td class='drawer' rowspan='2'><img src='img/icon-draw.png' class='pencil'></td>");
+    		else if(players[i].guessed)
+      			tr.append("<td class='guessed' rowspan='2'><img src='img/check-mark.png' class='pencil'></td>");
 		else
-			tr.append("<td rowspan='2'></td>");
+			tr.append("<td rowspan='2' class='thirdCol'></td>");
 		$("#userList").append(tr);
 		$("#userList").append("<tr><td class='playerScore'>" + players[i].score + "</td></tr>");
 	}
+});
+
+socket.on("displayWords", function(word1, word2, word3){
+  var setWord;
+  socket.emit("getChosenWord", setWord);
+});
+
+socket.on("displayWordToAll", function(setWord){
+  $("#currentWord").empty();
+  var table = $("<table></table>");
+  var tr = $("<tr></tr>");
+  for(var i = 0; i < setWord.length; i++){
+    tr.append("<td class='letterMarkers'>" + setWord.charAt(i) + "</td>");
+  }
+  table.append(tr);
+  $("#currentWord").append(table);
 });
 
 socket.on("sayAll", function(dataFromServer) {
