@@ -15,6 +15,7 @@ var db;
 var players = [];
 var allSockets = [];
 var words = ["football", "needle", "swing", "flower", "cookie", "ghost", "jellyfish", "lollipop", "hockey", "treasure"];
+var setWord;
 
 function randomElementIn(theArray) {
 	var i = Math.floor(theArray.length * Math.random());
