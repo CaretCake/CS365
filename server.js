@@ -56,30 +56,57 @@ io.on("connection", function(socket) {
 
 	socket.on("chat", function(textInput) {
 		var i = allSockets.indexOf(socket);
-		var textString = players[i].name + ": " + textInput;
-		io.emit("sayAll", textString);
+		for(var j = 0; j < guessedPlayers.length; j++){
+			if(guessedPlayers[j] == players[i])
+				var playerAlreadyGuessed = true;
+			else
+				playerAlreadyGuessed = false;
+		}
+		if(playerAlreadyGuessed){
+			var textString = "**" + players[i].name + "**: " + textInput;
+			io.emit("sayAll", textString);
+		}
+		else{
+			if(textInput.toLowerCase() == setWord.toLowerCase()){
+				players[i].guessed = true;
+				guessedPlayers.push(players[i]);
+				var textString = "****" + players[i].name + " has guessed the word!****";
+				io.emit("sayAll", textString);
+				io.emit("updateUsers", players);
+			}
+			else{
+				var textString = players[i].name + ": " + textInput;
+				io.emit("sayAll", textString);
+			}
+		}
 	});
 
-	socket.on("getWord"), function(){
-		var roundWord = randomElementIn(words);
-		io.emit("sendWord", roundWord);
+	socket.on("getThreeWords", function(){
+		var word1 = randomElementIn(words);
+		var word2 = randomElementIn(words);
+		while(word1 == word2)
+			word2 = randomElementIn(words);
+		var word3 = randomElementIn(words);
+		while(word3 == word1 || word3 == word2)
+			word3 = randomElementIn(words);
+		io.emit("displayWords", word1, word2, word3);
+	});
 
-	}
-
-	socket.on("checkAnswer", function(textInput){
-
-
-
+	socket.on("getChosenWord", function(chosenWord){
+		setWord = chosenWord;
+		io.emit("displayWordToAll", setWord);
 	});
 
 	socket.on("login", function(username) {
-		//Empty string is bad
 		if (username === "") {
 			socket.emit("loginBad", "Please enter a username.");
 			return;
 		}
-		var playerNum = players.length;
-		for(var i = 0; i < playerNum; i++) {
+		if(username.length > 8){
+			socket.emit("loginBad", "Please choose a username that is 8 characters or less.");
+			return;
+		}
+		for(var i = 0; i < players.length; i++) {
 			if (username.toUpperCase() === players[i].name.toUpperCase()) {
 				socket.emit("loginBad", "Username already taken, please try another.");
 				return;
@@ -87,7 +114,10 @@ io.on("connection", function(socket) {
 		}
 		allSockets.push(socket);
 		var socketNum = allSockets.indexOf(socket);
-		players.push({name: username, score: 0, drawer: false, rank: playerNum, answerRank: 0, socket: socketNum});
+		if(allSockets.length == 1)
+			players.push({name: username, score: 0, drawer: true, guessed: false, rank: allSockets.length, answerRank: 0, socket: socketNum});
+		else
+			players.push({name: username, score: 0, drawer: false, guessed: false, rank: allSockets.length, answerRank: 0, socket: socketNum});
 		socket.emit("loginOk");
 		io.emit("updateUsers", players);
 	});
