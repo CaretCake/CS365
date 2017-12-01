@@ -20,13 +20,13 @@
 						<p id="loginError"></p>
 					</div>
 					<div id="boxfoot">
-						<button type="button" id="login">Login</button>
+						<button type="button" class="button-background button-click" id="login">Login</button>
 					</div>
 				</div>
 			</div>
 		</div>
-		
-		
+
+
 		<div class="center">
 			<header>
 				<h1>Doodle Scribble Draw</h1>
@@ -39,7 +39,8 @@
 						<div class="text">90</div>
 					</div>
 					<div id="currentWord">
-
+					</div>
+					<div id="gameRound">
 					</div>
 				</div>
 
@@ -50,16 +51,22 @@
 							</table>
 						</div>
 						<div id="kickButton">
-							<button class="button-background" id="voteKick">Vote to Kick</button>
+							<button class="button-background button-click" id="voteKick">Vote to Kick</button>
 						</div>
 					</div>
 
 					<div class="drawingContainer">
-						<canvas class="background no-selection" id="canvas">
-						</canvas>
+						<div class="canvasContainer">
+							<canvas class="background no-selection" id="canvas">
+							</canvas>
+							<div class="no-selection" id="roundUpdateDisplay">
+								<div id="roundUpdateText">
+								</div>
+							</div>
+						</div>
 
 						<div class="toolBar">
-							<img src="img/black.png" alt="current color" height="40" width="40" class="left-margin border no-selection" id="current-color">
+							<img src="img/black.png" alt="current color" height="40" width="40" class="border no-selection" id="current-color">
 							<table class="border">
 								<tr>
 									<td>
@@ -119,7 +126,7 @@
 							<img src="img/icon-smallbrush.png" alt="brush tool" height="30" width="30" title="small brush" class="tool left-margin-neg top-margin neg-margin no-selection" id="small-brush">
 							<img src="img/icon-medbrush.png" alt="brush tool" height="30" width="30" title="medium brush" class="tool top-margin no-selection" id="med-brush">
 							<img src="img/icon-largebrush.png" alt="brush tool" height="30" width="30" title="large brush" class="tool top-margin no-selection" id="large-brush">
-							
+
 							<img src="img/icon-draw.png" alt="brush tool" height="38" width="38" title="draw tool" class="tool left-margin button-background no-selection hvr-rotate button-on-click" id="brush-tool">
 							<img src="img/icon-rect.png" alt="rectangle tool" height="38" width="38" title="draw a rectangle" class="tool left-margin button-background no-selection hvr-rotate button-on-click" id="rect-tool">
 							<img src="img/icon-circle.png" alt="circle tool" height="38" width="38" title="draw a circle" class="tool left-margin button-background no-selection hvr-rotate button-on-click" id="circle-tool">
@@ -134,7 +141,7 @@
 						<textarea id="chatField" disabled="disabled"></textarea>
 
 						<input id="chatText" type="text" placeholder="Type your guess here...">
-						<button class="hvr-bubble-left button-background" id="chatButton" type="button">Chat</button>
+						<button class="hvr-bubble-left button-background button-click" id="chatButton" type="button">Chat</button>
 					</div>
 				</div>
 			</div>
