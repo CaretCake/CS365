@@ -12,10 +12,11 @@ var io = socketIo(server);
 
 var db;
 
+var guessedPlayers = [];
 var players = [];
 var allSockets = [];
 var words = ["football", "needle", "swing", "flower", "cookie", "ghost", "jellyfish", "lollipop", "hockey", "treasure"];
-var setWord;
+var setWord = " ";
 
 function randomElementIn(theArray) {
 	var i = Math.floor(theArray.length * Math.random());
@@ -33,12 +34,9 @@ mongoClient.connect("mongodb://localhost:27017/scribbleGame", function(err, data
 		db = database;
 	}
 });
-
-
 function updateClientGUIs() {
 db.collection("words").find({})
 	if(err == null)
-
 }
 */
 
@@ -68,7 +66,8 @@ io.on("connection", function(socket) {
 			io.emit("sayAll", textString);
 		}
 		else{
-			if(textInput.toLowerCase() == setWord.toLowerCase()){
+			console.log(setWord);
+			if(textInput.toLowerCase() === setWord.toLowerCase()){
 				players[i].guessed = true;
 				guessedPlayers.push(players[i]);
 				var textString = "****" + players[i].name + " has guessed the word!****";
@@ -90,12 +89,14 @@ io.on("connection", function(socket) {
 		var word3 = randomElementIn(words);
 		while(word3 == word1 || word3 == word2)
 			word3 = randomElementIn(words);
-		io.emit("displayWords", word1, word2, word3);
+		socket.emit("displayWords", word1, word2, word3);
 	});
 
 	socket.on("getChosenWord", function(chosenWord){
+		console.log(chosenWord);
 		setWord = chosenWord;
-		io.emit("displayWordToAll", setWord);
+		// TODO: Change when no longer necessary
+		io.emit("displayWordToAll", chosenWord);
 	});
 
 	socket.on("login", function(username) {
@@ -122,6 +123,8 @@ io.on("connection", function(socket) {
 		socket.emit("loginOk");
 		io.emit("updateUsers", players);
 	});
+
+
 
 /*
 	socket.on("getWord", function(){
@@ -157,16 +160,13 @@ function randomElementIn(theArray) {
 	var i = Math.floor(theArray.length * Math.random());
 	return theArray[i];
 }
-
 function getRandomWord(){
 	var words = ["football", "needle", "swing", "flower", "cookie", "ghost", "jellyfish", "lollipop", "hockey", "treasure"];
 	var ret = {};
 	ret.word = randomElementIn(words);
 	ret.length = ret.word.length;
-
 	return ret;
 }
-
 function insertWord(db, callback){
 	var collection = db.collection("words");
 	collection.insertOne(getRandomWord(), function(err, result){
