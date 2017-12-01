@@ -10,8 +10,8 @@ var startY;
 //TEMPORARY VARIABLES FOR TESTING
 var playerListScore = [];
 playerListScore[0] = {player: 'Jack', score: 303330}
-playerListScore[1] = {player: 'Pumpkin Pie', score: 202}
-playerListScore[2] = {player: 'CakeLover123', score: 10};
+playerListScore[1] = {player: 'Pumpkin', score: 202}
+playerListScore[2] = {player: 'Enthuse', score: 10};
 
 var brushTool;
 var rectTool;
@@ -256,6 +256,11 @@ function setToolsFalse() {
 	eraserTool = false;
 }
 
+socket.on("pickingWord", function(drawerName) {
+  displayOverlayToggle();
+  $('#roundUpdateText').empty();
+  $('#roundUpdateText').append("<h2>" + drawerName + "is picking a word!</h2>");
+});
 
 socket.on("displayWords", function(word1, word2, word3) {
   displayOverlayToggle();
@@ -291,7 +296,7 @@ socket.on("displayWordToAll", function(setWord){
   $("#currentWord").append(table);
 });
 
-function displayScoreList() {
+socket.on("displayScoreList", function(array) {
   displayOverlayToggle();
   $('#roundUpdateText').empty();
   $('#roundUpdateText').append('<h2>Scores</h2>');
@@ -303,7 +308,7 @@ function displayScoreList() {
   }
   playerEntries += "</ol>"
   $('#roundUpdateText').append(playerEntries);
-}
+});
 
 function displayOverlayToggle() {
   $("#roundUpdateDisplay").toggle();
