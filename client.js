@@ -7,16 +7,20 @@ var mouseIsDown;
 var startX;
 var startY;
 
+//TEMPORARY VARIABLES FOR TESTING
+var playerListScore = [];
+playerListScore[0] = {player: 'Jack', score: 303330}
+playerListScore[1] = {player: 'Pumpkin Pie', score: 202}
+playerListScore[2] = {player: 'CakeLover123', score: 10};
+
 var brushTool;
 var rectTool;
 var circleTool;
-var fillTool;
 var eraserTool;
 
-var cursorDraw = "url(img/cursor-draw.png) 0 0, auto";
 var cursorSmallBrush = "url(img/cursor-small-draw.png) 10 10, auto";
 var cursorMedBrush = "url(img/cursor-med-draw.png) 10 10, auto";
-var cursorLargeBrush = "url(img/cursor-large-draw.png) 10 10, auto";
+var cursorLargeBrush = "url(img/cursor-large-draw.png) 15 15, auto";
 var cursorCircle = "url(img/cursor-circle.png) 0 10, auto";
 var cursorRect = "url(img/cursor-rect.png) 0 10, auto";
 var cursorEraser = "url(img/cursor-eraser.png) 0 34, auto";
@@ -73,31 +77,18 @@ socket.on("updateUsers", function(players){
 		var playerNum = i+1;
 		tr.append("<td class='playerRank' rowspan='2'>#" + players[i].rank + " </td>");
 		tr.append("<td class='playerNames'>" + sanitizeForHTML(players[i].name) + "</td>");
-		if(players[i].drawer)
-			tr.append("<td class='drawer' rowspan='2'><img src='img/icon-draw.png' class='pencil'></td>");
-    		else if(players[i].guessed)
-      			tr.append("<td class='guessed' rowspan='2'><img src='img/check-mark.png' class='pencil'></td>");
-		else
-			tr.append("<td rowspan='2' class='thirdCol'></td>");
+		if(players[i].drawer) {
+      tr.append("<td class='drawer' rowspan='2'><img src='img/icon-draw.png' class='pencil'></td>");
+    }
+    else if(players[i].guessed) {
+    	tr.append("<td class='guessed' rowspan='2'><img src='img/check-mark.png' class='pencil'></td>");
+    }
+    else {
+      tr.append("<td rowspan='2' class='thirdCol'></td>");
+    }
 		$("#userList").append(tr);
 		$("#userList").append("<tr><td class='playerScore'>" + players[i].score + "</td></tr>");
 	}
-});
-
-socket.on("displayWords", function(word1, word2, word3){
-  var setWord;
-  socket.emit("getChosenWord", setWord);
-});
-
-socket.on("displayWordToAll", function(setWord){
-  $("#currentWord").empty();
-  var table = $("<table></table>");
-  var tr = $("<tr></tr>");
-  for(var i = 0; i < setWord.length; i++){
-    tr.append("<td class='letterMarkers'>" + setWord.charAt(i) + "</td>");
-  }
-  table.append(tr);
-  $("#currentWord").append(table);
 });
 
 socket.on("sayAll", function(dataFromServer) {
@@ -150,7 +141,6 @@ function findxy(res, e) {
 				if (eraserTool) {
 					ctx.fillStyle = "#ffffff";
 				}
-				ctx.fillRect(currX, currY, 2, 2);
 				ctx.closePath();
 				dot_flag = false;
 			}
@@ -159,6 +149,7 @@ function findxy(res, e) {
 			flag = false;
 		}
 		if (res == 'move') {
+      changeBrushSize(lineWidth);
 			if (flag) {
 				prevX = currX;
 				prevY = currY;
@@ -262,10 +253,73 @@ function setToolsFalse() {
 	brushTool = false;
 	rectTool = false;
 	circleTool = false;
-	fillTool = false;
 	eraserTool = false;
 }
 
+
+socket.on("displayWords", function(word1, word2, word3) {
+  displayOverlayToggle();
+  $('#roundUpdateText').empty();
+  var wordButtons = "<h2>Pick a Word!</h2><div id='wordButtonsDiv'>";
+  wordButtons += "<button class='wordButton' id='wordOne'>" + word1 + "</button>";
+  wordButtons += "<button class='wordButton' id='wordTwo'>" + word2 + "</button>";
+  wordButtons += "<button class='wordButton' id='wordThree'>" + word3 + "</button></div>";
+  $('#roundUpdateText').append(wordButtons);
+  $("#wordOne").click(function() {
+    console.log(word1);
+  	socket.emit("getChosenWord", word1);
+  });
+  $("#wordTwo").click(function() {
+    console.log(word2);
+    socket.emit("getChosenWord", word2);
+  });
+  $("#wordThree").click(function() {
+    console.log(word3);
+    socket.emit("getChosenWord", word3);
+  });
+});
+
+socket.on("displayWordToAll", function(setWord){
+  displayOverlayToggle();
+  $("#currentWord").empty();
+  var table = $("<table></table>");
+  var tr = $("<tr></tr>");
+  for(var i = 0; i < setWord.length; i++){
+    tr.append("<td class='letterMarkers'>" + setWord.charAt(i) + "</td>");
+  }
+  table.append(tr);
+  $("#currentWord").append(table);
+});
+
+function displayScoreList() {
+  displayOverlayToggle();
+  $('#roundUpdateText').empty();
+  $('#roundUpdateText').append('<h2>Scores</h2>');
+  var playerEntries = "<ol>";
+  for (var i = 0; i < playerListScore.length; i++) {
+    playerEntries += "<li><span id='nameSpan'>";
+    playerEntries += playerListScore[i].player + "</span><span id='scoreSpan'>" + playerListScore[i].score;
+    playerEntries += "</span></li>";
+  }
+  playerEntries += "</ol>"
+  $('#roundUpdateText').append(playerEntries);
+}
+
+function displayOverlayToggle() {
+  $("#roundUpdateDisplay").toggle();
+  if($("#roundUpdateDisplay").css("display") === "flex") {
+    $("#roundUpdateDisplay").css("display", "none");
+  }
+  else if($("#roundUpdateDisplay").css("display") === "none") {
+    $("#roundUpdateDisplay").css("display", "flex");
+  }
+  if($("#canvas").css("position") === "absolute") {
+    $("#canvas").css("position", "relative");
+  }
+  else if($("#canvas").css("position") === "relative") {
+    $("#canvas").css("position", "absolute");
+  }
+}
 
 function startUp(){
 	//adjustCanvasHeight();
@@ -277,13 +331,14 @@ function startUp(){
 	w = 600;
 	h = 500;
 	offset = $(canvas).offset();
+  changeBrushSize(lineWidth);
+
 
 	mouseIsDown = false;
 
 	brushTool = true;
 	rectTool = false;
 	circleTool = false;
-	fillTool = false;
 	eraserTool = false;
 
 	canvas.addEventListener("mousemove", function (e) {
@@ -302,10 +357,11 @@ function startUp(){
 			findxy('click', e)
 	}, false);
 
-    // tool clicks
-    $("#brush-tool").click(function() {
+  // tool clicks
+  $("#brush-tool").click(function() {
 		setToolsFalse();
 		brushTool = true;
+		changeBrushSize(lineWidth);
 	});
 	$("#rect-tool").click(function() {
 		setToolsFalse();
@@ -316,10 +372,6 @@ function startUp(){
 		setToolsFalse();
 		circleTool = true;
 		canvas.style.cursor = cursorCircle;
-	});
-	$("#fill-tool").click(function() {
-		setToolsFalse();
-		fillTool = true;
 	});
 	$("#eraser-tool").click(function() {
 		setToolsFalse();
@@ -413,6 +465,10 @@ function startUp(){
 		}
 	});
 	loadLogin();
+  socket.emit("getThreeWords");
+
+  //displayWords("treasure", "pie", "award");
+  //displayScoreList(playerListScore);
 }
 
 
