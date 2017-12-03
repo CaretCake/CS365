@@ -126,13 +126,13 @@ io.on("connection", function(socket) {
 					var votekick = true;
 			}
 			else{
-				var textString = "A player has voted to kick the drawer (" + votekickCount + " of " + (players.length/2 + 1) + ")";
+				var textString = "**Vote kicking the drawer at " + votekickCount + "/" + (players.length/2 + 1) + "votes**";
 				if(votekickCount == (players.length/2 + 1))
 					var votekick = true;
 			}
 		}
 		else{
-			var textString = "A player has voted to kick the drawer (" + votekickCount + " of " + ((players.length + 1)/2) + ")";
+			var textString = "**Vote kicking the drawer at " + votekickCount + "/" + ((players.length + 1)/2) + "votes**";
 			if(votekickCount == ((players.length + 1)/2))
 				var votekick = true;
 		}
