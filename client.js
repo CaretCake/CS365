@@ -10,8 +10,8 @@ var startY;
 //TEMPORARY VARIABLES FOR TESTING
 var playerListScore = [];
 playerListScore[0] = {player: 'Jack', score: 303330}
-playerListScore[1] = {player: 'Pumpkin', score: 202}
-playerListScore[2] = {player: 'Enthuse', score: 10};
+playerListScore[1] = {player: 'Pumpkin Pie', score: 202}
+playerListScore[2] = {player: 'CakeLover123', score: 10};
 
 var brushTool;
 var rectTool;
@@ -56,6 +56,15 @@ socket.on("loginOk", function(){
 	$("#box").css("display", "none");
 });
 
+socket.on("playerKicked", function(errorMessage){
+  $("#loginOverlay").css("display", "block");
+	$("#box").css("display", "block");
+  $("#loginError").empty();
+  $("#loginError").append(errorMessage);
+  $("#userName").val("");
+  $("#userName").focus();
+});
+
 function sanitizeForHTML(stringToConvert) {
 	stringToConvert = stringToConvert.replace(/&/g, "&amp;");
 	stringToConvert = stringToConvert.replace(/</g, "&lt;");
@@ -97,7 +106,6 @@ socket.on("sayAll", function(dataFromServer) {
 
 function sendChatToServer() {
 	socket.emit("chat", $("#chatText").val() );
-	socket.emit("checkAnswer", $("#chatText").val() );
 	$("#chatText").val("");
 	$("#chatText").focus();
 }
@@ -256,11 +264,6 @@ function setToolsFalse() {
 	eraserTool = false;
 }
 
-socket.on("pickingWord", function(drawerName) {
-  displayOverlayToggle();
-  $('#roundUpdateText').empty();
-  $('#roundUpdateText').append("<h2>" + drawerName + "is picking a word!</h2>");
-});
 
 socket.on("displayWords", function(word1, word2, word3) {
   displayOverlayToggle();
@@ -290,13 +293,26 @@ socket.on("displayWordToAll", function(setWord){
   var table = $("<table></table>");
   var tr = $("<tr></tr>");
   for(var i = 0; i < setWord.length; i++){
+    tr.append("<td class='letterMarkers'></td>");
+  }
+  table.append(tr);
+  $("#currentWord").append(table);
+});
+
+socket.on("displayWordToDrawer", function(setWord){
+  displayOverlayToggle();
+  console.log("Display to drawer");
+  $("#currentWord").empty();
+  var table = $("<table></table>");
+  var tr = $("<tr></tr>");
+  for(var i = 0; i < setWord.length; i++){
     tr.append("<td class='letterMarkers'>" + setWord.charAt(i) + "</td>");
   }
   table.append(tr);
   $("#currentWord").append(table);
 });
 
-socket.on("displayScoreList", function(array) {
+function displayScoreList() {
   displayOverlayToggle();
   $('#roundUpdateText').empty();
   $('#roundUpdateText').append('<h2>Scores</h2>');
@@ -308,7 +324,7 @@ socket.on("displayScoreList", function(array) {
   }
   playerEntries += "</ol>"
   $('#roundUpdateText').append(playerEntries);
-});
+}
 
 function displayOverlayToggle() {
   $("#roundUpdateDisplay").toggle();
@@ -461,6 +477,11 @@ function startUp(){
 			event.preventDefault();
 		}
 	});
+
+  $("#voteKick").click(function(){
+    //console.log("HELLO from the client");
+    socket.emit("votekick");
+  });
 
 	$("#chatButton").click(sendChatToServer);
 	$("#chatText").keypress(function(event) {
