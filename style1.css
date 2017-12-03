@@ -3,10 +3,19 @@
 html {
 	height: 100%;
 	font-family: 'Source Sans Pro', sans-serif;
+	cursor: url(img/cursor.png), auto;
 }
 
 body {
 	counter-reset: item;
+}
+
+textarea {
+	cursor: url(img/cursor.png), auto;
+}
+
+button {
+	cursor: url(img/cursor.png), auto;
 }
 
 #loginOverlay{
@@ -24,12 +33,14 @@ body {
 	background-color: #1d91c3;
 	border-radius: 7px;
 	width: 600px;
+	height: 200px;
 	z-index: 10;
-	top: 100px;
+	top: 250px;
 }
 #content{
 	background-color: #FFF;
 	margin: 3px;
+	height: 194px;
 }
 #boxhead{
 	background-color: #1d91c3;
@@ -39,6 +50,10 @@ body {
 	padding-bottom: 15px;
 	text-align: center;
 	color: white;
+}
+#boxhead h2 {
+	margin: 0;
+	margin-top: -10px;
 }
 #boxbody{
 	background-color: #FFF;
@@ -81,16 +96,22 @@ header {
 	width: 100%;
 }
 
-header h1{
-	margin: 0;
+h1{
+	padding-top: 17px;
 	font-family: 'Caveat Brush', cursive;
+	font-size: 70px;
+	color: white;
+	text-shadow: 0 1px 0 #ccc, 0 2px 0 #c9c9c9, 0 3px 0 #bbb, 0 4px 0 #b9b9b9, 0 5px 0 #aaa, 0 6px 1px rgba(0,0,0,.1), 0 0 5px rgba(0,0,0,.1), 0 1px 3px rgba(0,0,0,.3), 0 3px 5px rgba(0,0,0,.2), 0 5px 10px rgba(0,0,0,.25), 0 10px 10px rgba(0,0,0,.2), 0 20px 20px rgba(0,0,0,.15);
 }
 
 h2 {
+	color: white;
 	font-family: 'Caveat Brush', cursive;
 	font-size: 40px;
 	margin-bottom: 0;
+	text-shadow: 0 1px 0 #ccc, 0 2px 0 #c9c9c9, 0 3px 0 #bbb, 0 4px 0 #b9b9b9, 0 5px 0 #aaa, 0 6px 1px rgba(0,0,0,.1), 0 0 5px rgba(0,0,0,.1), 0 1px 3px rgba(0,0,0,.3), 0 3px 5px rgba(0,0,0,.2), 0 5px 10px rgba(0,0,0,.25), 0 10px 10px rgba(0,0,0,.2), 0 20px 20px rgba(0,0,0,.15);
 }
+
 
 #wordButtonsDiv {
 	display: flex;
@@ -102,6 +123,12 @@ h2 {
 	min-width: 100px;
 	height: 40px;
 	margin: 15px;
+	background: linear-gradient(#f7b53b, #FF941C);
+}
+
+.wordButton:active {
+	border: 2px outset #f7b53b;
+	box-shadow: 1px 1px 10px #8e8e8e;
 }
 
 .background {
@@ -121,13 +148,16 @@ h2 {
 }
 
 #gameStatusBar {
-	border: 1px solid black;
+	border: 2px solid white;
 	height: 75px;
-	margin-bottom: 10px;
 	box-sizing: border-box;
 	display: flex;
 	flex-direction: row;
 	justify-content: center;
+	margin: auto;
+	margin-top: 10px;
+	margin-bottom: 10px;
+  border-radius: 4px;
 }
 
 #gameRound {
@@ -150,6 +180,41 @@ h2 {
  	width: 35px;
  	text-align: center;
  }
+
+ #idleCheck {
+ 	display: none;
+	justify-content: center;
+}
+
+#areYouStillThere {
+	position: fixed;
+  background-color: #1d91c3;
+  border-radius: 7px;
+  width: 450px;
+  height: 225px;
+  z-index: 10;
+	top: 250px;
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+	align-items: center;
+	box-shadow: 0px 0px 10px #9c9c9c;
+}
+
+#idleHead h2 {
+	margin-top: 0;
+	color: white;
+}
+
+#idleConfirm {
+	margin-top: 50px;
+	width: 150px;
+	height: 40px;
+}
+
+#idleConfirm:active {
+	border: 2px inset #f7b53b;
+}
 
 .timer {
 	float: left;
@@ -201,6 +266,7 @@ h2 {
 	height: 650px;
 	min-width: 880px;
 	box-sizing: border-box;
+	justify-content: center;
 }
 
 #userSidebar{
@@ -325,6 +391,7 @@ h2 {
 	-webkit-transition-property: transform;
 	transition-property: transform;
 }
+
 .hvr-rotate:hover, .hvr-rotate:focus, .hvr-rotate:active {
 	-webkit-transform: rotate(4deg);
 	transform: rotate(4deg);
@@ -338,6 +405,7 @@ h2 {
 	box-shadow: 0 0 1px transparent;
 	position: relative;
 }
+
 .hvr-bubble-left:before {
 	pointer-events: none;
 	position: absolute;
@@ -353,6 +421,7 @@ h2 {
 	border-width: 10px 10px 10px 0;
 	border-color: transparent #FF941C transparent transparent;
 }
+
 .hvr-bubble-left:hover:before, .hvr-bubble-left:focus:before, .hvr-bubble-left:active:before {
 	-webkit-transform: translateX(-10px);
 	transform: translateX(-10px);
@@ -503,7 +572,7 @@ input:focus {
 	width: calc(100% - 10px);
 	box-sizing: border-box;
 	margin: 10px 5px 0px 5px;
-	height: 90%;
+	height: 92%;
 	border-radius: 4px;
 }
 
