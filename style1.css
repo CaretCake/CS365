@@ -6,10 +6,6 @@ html {
 	cursor: url(img/cursor.png), auto;
 }
 
-body {
-	counter-reset: item;
-}
-
 textarea {
 	cursor: url(img/cursor.png), auto;
 }
@@ -484,7 +480,7 @@ h2 {
 	position: relative;
 }
 
-#roundUpdateDisplay {
+#sessionUpdateDisplay {
 	width: 600px;
 	height: 500px;
 	justify-content: center;
@@ -499,7 +495,7 @@ h2 {
 
 
 
-#roundUpdateText {
+#sessionUpdateText {
 	display: flex;
 	flex-direction: column;
 }
@@ -513,23 +509,7 @@ ol {
 }
 
 li {
-  counter-increment: item;
   margin-bottom: 10px;
-}
-
-li:before {
-  margin-right: 10px;
-  content: counter(item);
-  background: #ff941c;
-  border-radius: 100%;
-  color: white;
-  width: 2em;
-	height: 2em;
-  text-align: center;
-  display: inline-flex;
-	justify-content: center;
-	align-items: center;
-	vertical-align: middle;
 }
 
 #nameSpan {
