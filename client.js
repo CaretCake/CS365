@@ -6,12 +6,16 @@ var currColor;
 var mouseIsDown;
 var startX;
 var startY;
+var idleTime;
+var idleStatus;
 
 //TEMPORARY VARIABLES FOR TESTING
+/*
 var playerListScore = [];
 playerListScore[0] = {player: 'Jack', score: 303330}
-playerListScore[1] = {player: 'Pumpkin Pie', score: 202}
-playerListScore[2] = {player: 'CakeLover123', score: 10};
+playerListScore[1] = {player: 'Pumpkin', score: 202}
+playerListScore[2] = {player: 'Enthuse', score: 10};
+*/
 
 var brushTool;
 var rectTool;
@@ -30,8 +34,7 @@ var canvas, ctx, flag = false,
     prevX = 0,
     currX = 0,
     prevY = 0,
-    currY = 0,
-    dot_flag = false;
+    currY = 0;
 
 var color = "black",
     lineWidth = 8;
@@ -89,7 +92,7 @@ socket.on("updateUsers", function(players){
 		if(players[i].drawer) {
       tr.append("<td class='drawer' rowspan='2'><img src='img/icon-draw.png' class='pencil'></td>");
     }
-    else if(players[i].guessed) {
+    else if(players[i].guessed && players[i].drawer == false) {
     	tr.append("<td class='guessed' rowspan='2'><img src='img/check-mark.png' class='pencil'></td>");
     }
     else {
@@ -119,17 +122,17 @@ function sendChatToServer() {
 }*/
 
 function draw() {
-    ctx.beginPath();
-    ctx.moveTo(prevX, prevY);
+  ctx.beginPath();
+  ctx.moveTo(prevX, prevY);
 	ctx.lineTo(currX, currY);
 	ctx.lineJoin = ctx.lineCap = 'round';
-    ctx.strokeStyle = color;
-    if (eraserTool) {
-		ctx.strokeStyle = "#ffffff";
+  ctx.strokeStyle = color;
+  if (eraserTool) {
+    ctx.strokeStyle = "#ffffff";
 	}
-    ctx.lineWidth = lineWidth;
-    ctx.stroke();
-    ctx.closePath();
+  ctx.lineWidth = lineWidth;
+  ctx.stroke();
+  ctx.closePath();
 }
 
 function findxy(res, e) {
@@ -142,16 +145,6 @@ function findxy(res, e) {
 			currY = e.pageY - offset.top;
 
 			flag = true;
-			dot_flag = true;
-			if (dot_flag) {
-				ctx.beginPath();
-				ctx.fillStyle = color;
-				if (eraserTool) {
-					ctx.fillStyle = "#ffffff";
-				}
-				ctx.closePath();
-				dot_flag = false;
-			}
 		}
 		if (res == 'up' || res == "out") {
 			flag = false;
@@ -246,7 +239,7 @@ function changeBrushSize(newSize) {
 	lineWidth = newSize;
 	if (brushTool) {
 		if (lineWidth == 30) {
-			canvas.style.cursor = cursorLargeBrush;
+  			canvas.style.cursor = cursorLargeBrush;
 		}
 		else if (lineWidth == 15) {
 			canvas.style.cursor = cursorMedBrush;
@@ -264,27 +257,41 @@ function setToolsFalse() {
 	eraserTool = false;
 }
 
-
-socket.on("displayWords", function(word1, word2, word3) {
+socket.on("pickingWord", function(drawerName) {
   displayOverlayToggle();
-  $('#roundUpdateText').empty();
+  $('#sessionUpdateText').empty();
+  $('#sessionUpdateText').append("<h2>" + drawerName + " is picking a word!</h2>");
+});
+
+socket.on("needMorePlayers", function(){
+  $('#sessionUpdateText').empty();
+  $('#sessionUpdateText').append("<h2>Waiting for another player! <br> Hold tight!</h2>");
+});
+
+socket.on("displayWords", function(threeWords) {
+  //if(!gameStart)
+    displayOverlayToggle();
+  console.log("Hello");
+  idleStatus = true;
+  $('#sessionUpdateText').empty();
   var wordButtons = "<h2>Pick a Word!</h2><div id='wordButtonsDiv'>";
-  wordButtons += "<button class='wordButton' id='wordOne'>" + word1 + "</button>";
-  wordButtons += "<button class='wordButton' id='wordTwo'>" + word2 + "</button>";
-  wordButtons += "<button class='wordButton' id='wordThree'>" + word3 + "</button></div>";
-  $('#roundUpdateText').append(wordButtons);
+  wordButtons += "<button class='wordButton button-background' id='wordOne'>" + threeWords[0] + "</button>";
+  wordButtons += "<button class='wordButton button-background' id='wordTwo'>" + threeWords[1] + "</button>";
+  wordButtons += "<button class='wordButton button-background' id='wordThree'>" + threeWords[2] + "</button></div>";
+  $('#sessionUpdateText').append(wordButtons);
   $("#wordOne").click(function() {
-    console.log(word1);
-  	socket.emit("getChosenWord", word1);
+  	socket.emit("getChosenWord", threeWords[0]);
+    idleStatus = false;
   });
   $("#wordTwo").click(function() {
-    console.log(word2);
-    socket.emit("getChosenWord", word2);
+    socket.emit("getChosenWord", threeWords[1]);
+    idleStatus = false;
   });
   $("#wordThree").click(function() {
-    console.log(word3);
-    socket.emit("getChosenWord", word3);
+    socket.emit("getChosenWord", threeWords[2]);
+    idleStatus = false;
   });
+  setTimeout(isIdle, 15000);
 });
 
 socket.on("displayWordToAll", function(setWord){
@@ -293,18 +300,18 @@ socket.on("displayWordToAll", function(setWord){
   var table = $("<table></table>");
   var tr = $("<tr></tr>");
   for(var i = 0; i < setWord.length; i++){
-    tr.append("<td class='letterMarkers'></td>");
-  }
-  table.append(tr);
-  $("#currentWord").append(table);
-});
+     tr.append("<td class='letterMarkers'></td>");
+   }
+   table.append(tr);
+   $("#currentWord").append(table);
+ });
 
-socket.on("displayWordToDrawer", function(setWord){
-  displayOverlayToggle();
-  console.log("Display to drawer");
-  $("#currentWord").empty();
-  var table = $("<table></table>");
-  var tr = $("<tr></tr>");
+ socket.on("displayWordToDrawer", function(setWord){
+   displayOverlayToggle();
+   console.log("Display to drawer");
+   $("#currentWord").empty();
+   var table = $("<table></table>");
+   var tr = $("<tr></tr>");
   for(var i = 0; i < setWord.length; i++){
     tr.append("<td class='letterMarkers'>" + setWord.charAt(i) + "</td>");
   }
@@ -312,35 +319,80 @@ socket.on("displayWordToDrawer", function(setWord){
   $("#currentWord").append(table);
 });
 
-function displayScoreList() {
+socket.on("toggleVoteKick", function(){
+  $('#voteKick').prop("disabled", false);
+});
+
+socket.on("displayScoreList", function(array, winner, gameOver) {
+  console.log("display clientside");
   displayOverlayToggle();
-  $('#roundUpdateText').empty();
-  $('#roundUpdateText').append('<h2>Scores</h2>');
-  var playerEntries = "<ol>";
-  for (var i = 0; i < playerListScore.length; i++) {
-    playerEntries += "<li><span id='nameSpan'>";
-    playerEntries += playerListScore[i].player + "</span><span id='scoreSpan'>" + playerListScore[i].score;
-    playerEntries += "</span></li>";
+  $('#sessionUpdateText').empty();
+  if(gameOver){
+    $('#sessionUpdateText').append('<h1>Final Scores</h1>');
+    $('#sessionUpdateText').append('<h2>' + winner.name + ' has won the game!</h2>');
+    var playerEntries = "<ol>";
+    for (var i = 0; i < array.length; i++) {
+      playerEntries += "<li><span id='rankSpan'>" + array[i].rank + ". </span><span id='nameSpan'>";
+      playerEntries += array[i].name + "</span><span id='scoreSpan'>" + array[i].score;
+      playerEntries += "</span></li>";
+    }
+    playerEntries += "</ol>"
   }
-  playerEntries += "</ol>"
-  $('#roundUpdateText').append(playerEntries);
-}
+  else {
+    $('#sessionUpdateText').append('<h2>Scores</h2>');
+    var playerEntries = "<ol>";
+    for (var i = 0; i < array.length; i++) {
+      playerEntries += "<li><span id='rankSpan'>" + (i+1) + ". </span><span id='nameSpan'>";
+      playerEntries += array[i].name + "</span><span id='scoreSpan'>" + array[i].score;
+      playerEntries += "</span></li>";
+    }
+    playerEntries += "</ol>"
+  }
+  $('#sessionUpdateText').append(playerEntries);
+});
 
 function displayOverlayToggle() {
-  $("#roundUpdateDisplay").toggle();
-  if($("#roundUpdateDisplay").css("display") === "flex") {
-    $("#roundUpdateDisplay").css("display", "none");
+  $("#sessionUpdateDisplay").toggle();
+  if ($("#sessionUpdateDisplay").css("display") === "flex") {
+    $("#sessionUpdateDisplay").css("display", "none");
   }
-  else if($("#roundUpdateDisplay").css("display") === "none") {
-    $("#roundUpdateDisplay").css("display", "flex");
+  else if ($("#sessionUpdateDisplay").css("display") === "none") {
+    $("#sessionUpdateDisplay").css("display", "flex");
   }
-  if($("#canvas").css("position") === "absolute") {
+  if ($("#canvas").css("position") === "absolute") {
     $("#canvas").css("position", "relative");
   }
-  else if($("#canvas").css("position") === "relative") {
+  else if   ($("#canvas").css("position") === "relative") {
     $("#canvas").css("position", "absolute");
   }
 }
+
+socket.on("startSessionTimer", function(sessionTime) {
+  $('#timerText').empty();
+  $('#timerText').append(sessionTime);
+});
+
+function idleTimerIncrement() {
+  idleTime = idleTime + 5; //adds 5 seconds to idle time
+  if (idleTime > 24) { // 25 seconds
+      $("#idleCheck").css("display", "flex");
+      idleStatus = true;
+      setTimeout(isIdle, 10000);
+  }
+}
+
+function isIdle() {
+  if (idleStatus) {
+    //socket.emit("timedOut");
+  }
+}
+
+//socket.on("reset", function());
+
+socket.on("updateRound", function(roundNumber){
+  $("#gameRound").empty();
+  $("#gameRound").append("Round " + roundNumber + " of 10");
+});
 
 function startUp(){
 	//adjustCanvasHeight();
@@ -467,6 +519,17 @@ function startUp(){
 		changeBrushSize(30);
 	});
 
+  $("#idleConfirm").click(function() {
+    idleTime = 0;
+    $("#idleCheck").css("display", "none");
+    idleStatus = false;
+  });
+
+  $("#voteKick").click(function(){
+    $('#voteKick').prop("disabled", true);
+     socket.emit("votekick");
+  });
+
 	$("#userName").focus();
 	$("#login").click(function(){
 		socket.emit("login", $("#userName").val());
@@ -478,11 +541,6 @@ function startUp(){
 		}
 	});
 
-  $("#voteKick").click(function(){
-    //console.log("HELLO from the client");
-    socket.emit("votekick");
-  });
-
 	$("#chatButton").click(sendChatToServer);
 	$("#chatText").keypress(function(event) {
 		if (event.which == 13) {
@@ -490,11 +548,24 @@ function startUp(){
 			event.preventDefault();
 		}
 	});
+
+  //Increment the idle time counter every 5 seconds.
+  var idleInterval = setInterval(idleTimerIncrement, 5000); // 5 seconds
+
+  //Zero the idle timer on mouse movement.
+  $(this).mousemove(function (e) {
+      idleTime = 0;
+  });
+  $(this).keypress(function (e) {
+      idleTime = 0;
+  });
+  //displayOverlayToggle();
 	loadLogin();
-  socket.emit("getThreeWords");
+  //socket.emit("getThreeWords");
 
   //displayWords("treasure", "pie", "award");
   //displayScoreList(playerListScore);
+  //setInterval(startSessionTimer, 1000);
 }
 
 
