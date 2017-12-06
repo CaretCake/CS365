@@ -87,13 +87,13 @@ socket.on("updateUsers", function(players){
 	for(var i = 0; i < players.length; i++){
 		var tr = $("<tr></tr>");
 		var playerNum = i+1;
-		tr.append("<td class='playerRank' rowspan='2'>#" + players[i].rank + " </td>");
+		tr.append("<td class='playerRank numbers' rowspan='2'>#" + players[i].rank + " </td>");
 		tr.append("<td class='playerNames'>" + sanitizeForHTML(players[i].name) + "</td>");
 		if(players[i].drawer) {
-      tr.append("<td class='drawer' rowspan='2'><img src='img/icon-draw.png' class='pencil'></td>");
+      tr.append("<td class='drawer' rowspan='2'><img src='img/icon-draw.png' class='pencilCheck'></td>");
     }
     else if(players[i].guessed && players[i].drawer == false) {
-    	tr.append("<td class='guessed' rowspan='2'><img src='img/check-mark.png' class='pencil'></td>");
+    	tr.append("<td class='guessed' rowspan='2'><img src='img/check-mark.png' class='pencilCheck'></td>");
     }
     else {
       tr.append("<td rowspan='2' class='thirdCol'></td>");
@@ -304,7 +304,7 @@ socket.on("needMorePlayers", function(){
 
 socket.on("displayWords", function(threeWords) {
   //if(!gameStart)
-    displayOverlayToggle();
+  displayOverlayToggle();
   console.log("Hello");
   idleStatus = true;
   $('#sessionUpdateText').empty();
@@ -325,7 +325,17 @@ socket.on("displayWords", function(threeWords) {
     socket.emit("getChosenWord", threeWords[2]);
     idleStatus = false;
   });
+  $("#toolBar").css("visibility", "visible");
+  $("#canvas").css("pointer-events", "auto");
   setTimeout(isIdle, 15000);
+});
+
+socket.on("hideToolBar", function(){
+  $("#toolBar").css("visibility", "hidden");
+});
+
+socket.on("disableCanvas", function(){
+  $("#canvas").css("pointer-events", "none");
 });
 
 socket.on("displayWordToAll", function(setWord){
@@ -366,8 +376,8 @@ socket.on("displayScoreList", function(array, winner, gameOver) {
     $('#sessionUpdateText').append('<h2>' + winner.name + ' has won the game!</h2>');
     var playerEntries = "<ol>";
     for (var i = 0; i < array.length; i++) {
-      playerEntries += "<li><span id='rankSpan'>" + array[i].rank + ". </span><span id='nameSpan'>";
-      playerEntries += array[i].name + "</span><span id='scoreSpan'>" + array[i].score;
+      playerEntries += "<li><span class='numbers' id='rankSpan'>" + array[i].rank + ". </span><span class='numbers' id='nameSpan'>";
+      playerEntries += array[i].name + "</span><span class='numbers' id='scoreSpan'>" + array[i].score;
       playerEntries += "</span></li>";
     }
     playerEntries += "</ol>"
@@ -376,8 +386,8 @@ socket.on("displayScoreList", function(array, winner, gameOver) {
     $('#sessionUpdateText').append('<h2>Scores</h2>');
     var playerEntries = "<ol>";
     for (var i = 0; i < array.length; i++) {
-      playerEntries += "<li><span id='rankSpan'>" + (i+1) + ". </span><span id='nameSpan'>";
-      playerEntries += array[i].name + "</span><span id='scoreSpan'>" + array[i].score;
+      playerEntries += "<li><span class='numbers' id='rankSpan'>" + (i+1) + ". </span><span class='numbers' id='nameSpan'>";
+      playerEntries += array[i].name + "</span><span class='numbers' id='scoreSpan'>" + array[i].score;
       playerEntries += "</span></li>";
     }
     playerEntries += "</ol>"
