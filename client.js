@@ -303,7 +303,6 @@ socket.on("needMorePlayers", function(){
 });
 
 socket.on("displayWords", function(threeWords) {
-  //if(!gameStart)
   displayOverlayToggle();
   console.log("Hello");
   idleStatus = true;
@@ -338,13 +337,17 @@ socket.on("disableCanvas", function(){
   $("#canvas").css("pointer-events", "none");
 });
 
-socket.on("displayWordToAll", function(setWord){
-  displayOverlayToggle();
+socket.on("displayWordToAll", function(setWord, sessionEnding){
+  if(!sessionEnding)
+    displayOverlayToggle();
   $("#currentWord").empty();
   var table = $("<table></table>");
   var tr = $("<tr></tr>");
   for(var i = 0; i < setWord.length; i++){
-     tr.append("<td class='letterMarkers'></td>");
+    if(sessionEnding)
+     tr.append("<td class='letterMarkers'>" + setWord[i] + "</td>");
+    else
+      tr.append("<td class='letterMarkers'></td>");
    }
    table.append(tr);
    $("#currentWord").append(table);
