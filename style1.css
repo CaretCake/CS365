@@ -1,9 +1,12 @@
 @import url('https://fonts.googleapis.com/css?family=Caveat+Brush|Source+Sans+Pro');
+@import "wordVoting.css";
 
 html {
 	height: 100%;
 	font-family: 'Source Sans Pro', sans-serif;
 	cursor: url(img/cursor.png), auto;
+	background: url("img/DoodleBackground.png") no-repeat fixed center;
+	background-size: 100%;
 }
 
 textarea {
@@ -137,7 +140,6 @@ h2 {
 	min-width: 880px;
 	display: flex;
 	flex-direction: column;
-	background-color: #17D162;
 	position: absolute;
 	top: 0;
 	left: 0;
