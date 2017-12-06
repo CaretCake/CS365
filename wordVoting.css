@@ -73,3 +73,45 @@
   height: 25px;
   display: block;
 }
+
+#add {
+  width: 30px;
+  height: 30px;
+  margin-left: -3px;
+}
+
+#wordBox {
+  width: 250px;
+  padding: 10px;
+  border: 1px dashed #17d162;
+  box-sizing: border-box;
+  text-align: center;
+  margin-right: 5px;
+  padding-top: 12px;
+  padding-bottom: 9px;
+}
+
+#addButton {
+  font-size: 20px;
+  color: #353535;
+  font-family: 'Caveat Brush', cursive;
+  background: #17d162;
+  border: none;
+  padding: 6px;
+  width: 90px;
+  margin-right: 5px;
+}
+
+#addButton active {
+  background: #ffffff;
+}
+
+#submissiontd {
+  align-items: center;
+  border-bottom-right-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+#submitRow {
+  height: 90px;
+}
