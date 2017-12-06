@@ -12,6 +12,7 @@ var io = socketIo(server);
 
 var db;
 
+var sessionDrawing = [];
 var loggedIn = false;
 var players = [];
 var gameScores = [];
@@ -20,6 +21,7 @@ var sessionScores = [];
 var allSockets = [];
 var threeWords = [];
 var words = ["football", "needle", "swing", "flower", "cookie", "ghost", "jellyfish", "lollipop", "hockey", "treasure"];
+var votingWords = [{word: "mario", points: 49}, {word: "sword", points: 48}, {word: "sunglasses", points: 46}, {word: "helicopter", points: 46}, {word: "computer", points: 44}, {word: "rollercoaster", points: 37}, {word: "dragon", points: 34}, {word: "light", points: 32}, {word: "bone", points: 30}, {word: "lightsaber", points: 28}, {word: "dinosaur", points: 28}, {word: "monster", points: 26}, {word: "zombie", points: 21}, {word: "turtle", points: 16}, {word: "GLaDOS", points: 12}];
 var setWord;
 var votekickCount = 0;
 var sessionTime = 90;
@@ -130,7 +132,7 @@ function reset(){
 	}
 
 	//clear canvas
-	io.emit("clearCanvas");
+	clearCanv();
 	io.emit("displayWordToAll", "");
 	io.in('guessers').emit("pickingWord", players[newDrawer].name);
 	io.in('drawer').emit("displayWords", getThreeWords());
@@ -181,7 +183,7 @@ function displayCanvasScores(drawerIndex){
 		winner = players[0];
 		io.emit("displayScoreList", sessionScores, winner, false);
 	}
-	var timeOut = setTimeout(reset, 1000);
+	var timeOut = setTimeout(reset, 20000);
 }
 
 function startTimers(){
@@ -226,6 +228,12 @@ function updateGameRanks(){
 			}
 		}
 	}
+}
+
+function clearCanv() {
+	console.log("clear!");
+	io.emit("clearCanvas");
+	sessionDrawing.length = 0;
 }
 
 app.use(express.static("pub"));
@@ -295,6 +303,19 @@ io.on("connection", function(socket) {
 			}
 			else{
 				socket.emit("displayWordToAll", setWord);
+				socket.emit("toggleOverlayForUser");
+			}
+		}
+
+		for (var i = 0; i < sessionDrawing.length; i++) {
+			if (sessionDrawing[i].t == "brush" || sessionDrawing[i].t == "eraser") {
+				socket.emit("drawBrush", sessionDrawing[i].t, sessionDrawing[i].w, sessionDrawing[i].col, sessionDrawing[i].cl, sessionDrawing[i].prevX, sessionDrawing[i].prevY, sessionDrawing[i].currX, sessionDrawing[i].currY, sessionDrawing[i].fl);
+			}
+			else if (sessionDrawing[i].t == "rect") {
+				socket.emit("drawRect", sessionDrawing[i].col, sessionDrawing[i].prevX, sessionDrawing[i].prevY, sessionDrawing[i].currX, sessionDrawing[i].currY);
+			}
+			else if (sessionDrawing[i].t == "circle") {
+				socket.emit("drawCircle", sessionDrawing[i].col, sessionDrawing[i].prevX, sessionDrawing[i].prevY, sessionDrawing[i].currX, sessionDrawing[i].currY);
 			}
 		}
 	});
@@ -308,7 +329,7 @@ io.on("connection", function(socket) {
 		else{
 			if(textInput.toLowerCase() === setWord.toLowerCase()){
 				sessionScores.push({name: players[i].name, score: 5 * sessionTime});
-				//function findDrawer;
+				//function finder;
 				players[i].guessed = true;
 				socket.join('guessedWord');
 				var textString = "****" + players[i].name + " has guessed the word!****";
@@ -367,6 +388,46 @@ io.on("connection", function(socket) {
 		startTimersInterval = setInterval(startTimers, 1000);
 		sessionOverInterval = setInterval(ifSessionOver, 1000);
 		gameRunning = true;
+	});
+
+	socket.on("brushDraw", function(type, width, color, click, pX, pY, cX, cY, flag) {
+		io.emit("drawBrush", type, width, color, click, pX, pY, cX, cY, flag);
+		sessionDrawing.push({ t: type, w: width, col: color, cl: click, prevX: pX, prevY: pY, currX: cX, currY: cY, fl: flag});
+	});
+
+	socket.on("rectDraw", function(color, sX, sY, mX, mY) {
+		io.emit("drawRect", color, sX, sY, mX, mY);
+		sessionDrawing.push({ t: "rect", w: 0, col: color, cl: 0, prevX: sX, prevY: sY, currX: mX, currY: mY, fl: 0});
+	});
+
+	socket.on("circleDraw", function(color, sX, sY, mX, mY) {
+		io.emit("drawCircle", color, sX, sY, mX, mY);
+		sessionDrawing.push({ t: "circle", w: 0, col: color, cl: 0, prevX: sX, prevY: sY, currX: mX, currY: mY, fl: 0});
+
+	});
+
+	socket.on("clearDraw", function(color, sX, sY, mX, mY) {
+		clearCanv();
+	});
+
+	socket.on("getVotingWords", function(){
+		socket.emit("displayVotingWords", votingWords);
+		console.log("send voting words!");
+	});
+
+	socket.on("voteWord", function(votingWord, incOrDec) {
+		var voteIndex;
+		for (var i = 0; i < votingWords.length; i++) {
+			if (votingWords[i].word == votingWord) {
+				if(incOrDec) {
+					votingWords[i].points++;
+				}
+				else if(!incOrDec) {
+					votingWords[i].points--;
+				}
+			}
+		}
+		socket.emit("displayVotingWords", votingWords);
 	});
 
 
