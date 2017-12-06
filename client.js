@@ -121,114 +121,135 @@ function sendChatToServer() {
 	console.log(canvas.css(width));
 }*/
 
-function draw() {
-  ctx.beginPath();
-  ctx.moveTo(prevX, prevY);
-	ctx.lineTo(currX, currY);
-	ctx.lineJoin = ctx.lineCap = 'round';
-  ctx.strokeStyle = color;
-  if (eraserTool) {
-    ctx.strokeStyle = "#ffffff";
-	}
-  ctx.lineWidth = lineWidth;
-  ctx.stroke();
-  ctx.closePath();
-}
 
 function findxy(res, e) {
-	if (brushTool || eraserTool) {
-		if (res == 'down') {
+  if (brushTool || eraserTool) {
+    var type;
+    var click = false;
+    if (brushTool) {
+      type = "brush";
+    }
+    else if (eraserTool) {
+      type = "eraser";
+    }
+    if (res == 'down') {
 			changeBrushSize(lineWidth);
 			prevX = currX;
 			prevY = currY;
 			currX = e.pageX - offset.left;
 			currY = e.pageY - offset.top;
-
+      click = false;
 			flag = true;
 		}
 		if (res == 'up' || res == "out") {
+      var upX = e.pageX - offset.left;
+      var upY = e.pageY - offset.top;
+      if (res == 'up' && currX == upX && currY == upY) {
+        click = true;
+        console.log("click registered!");
+        socket.emit("brushDraw", type, lineWidth, color, click, upX, upY, currX, currY, flag);
+      }
+      else {
+        click = false;
+      }
 			flag = false;
 		}
 		if (res == 'move') {
       changeBrushSize(lineWidth);
+      console.log(flag);
 			if (flag) {
 				prevX = currX;
 				prevY = currY;
 				currX = e.pageX - offset.left;
 				currY = e.pageY - offset.top;
-				draw();
+        socket.emit("brushDraw", type, lineWidth, color, click, prevX, prevY, currX, currY, flag);
 			}
-    	}
-    	if (res == 'click' && res !== 'move') {
-			ctx.fillStyle = color;
-			if (eraserTool) {
-				ctx.fillStyle = "#ffffff";
-			}
-			ctx.beginPath();
-			var clickX = e.pageX - offset.left;
-			var clickY = e.pageY - offset.top;
-			ctx.arc(clickX, clickY, lineWidth/2, 0, 2*Math.PI, false);
-			ctx.fill();
-			ctx.closePath();
-		}
+    }
 	}
+
 	if (rectTool) {
 		if(mouseIsDown && res == 'up'){
-		    mouseIsDown=false;
+		    mouseIsDown = false;
 		    var mouseX = e.pageX - offset.left;
 		    var mouseY = e.pageY - offset.top;
-		    ctx.rect(startX,startY,mouseX-startX,mouseY-startY);
-		    ctx.fill();
-		    ctx.closePath();
+        socket.emit("rectDraw", color, startX, startY, mouseX, mouseY);
 		}
 		else if (res == 'down') {
-		    mouseIsDown=true;
+		    mouseIsDown = true;
 		    startX = e.pageX - offset.left;
 		    startY = e.pageY - offset.top;
-		    ctx.beginPath();
-		    ctx.fillStyle = color;
 		}
-		/*else if (res == 'move') {
-			var mouseX = e.pageX - offset.left;
-		    var mouseY = e.pageY - offset.top;
-		    ctx.beginPath();
-		    ctx.fillStyle = color;
-		    ctx.rect(startX,startY,mouseX-startX,mouseY-startY);
-		    ctx.fill();
-		}*/
 	}
+
 	if (circleTool) {
 			if(mouseIsDown && res == 'up'){
-			    mouseIsDown=false;
-			    var mouseX = e.pageX - offset.left;
-			    var mouseY = e.pageY - offset.top;
-			    ctx.fillStyle = color;
-			    ctx.beginPath();
-			    var midX = (startX+mouseX)/2;
-			    var midY = (startY+mouseY)/2;
-			    var radius = (startX-mouseX)/2;
-			    if (radius < 0) {
-					radius *= -1;
-				}
-				ctx.arc(midX, midY, radius, 0, 2*Math.PI, false);
-				ctx.fill();
-			    ctx.closePath();
+		    mouseIsDown = false;
+		    var mouseX = e.pageX - offset.left;
+		    var mouseY = e.pageY - offset.top;
+		    socket.emit("circleDraw", color, startX, startY, mouseX, mouseY);
 			}
 			else if (res == 'down') {
-			    mouseIsDown=true;
+			    mouseIsDown = true;
 			    startX = e.pageX - offset.left;
 			    startY = e.pageY - offset.top;
 			}
-			/*else if (res == 'move') {
-				var mouseX = e.pageX - offset.left;
-			    var mouseY = e.pageY - offset.top;
-			    ctx.beginPath();
-			    ctx.fillStyle = color;
-			    ctx.rect(startX,startY,mouseX-startX,mouseY-startY);
-			    ctx.fill();
-			}*/
 	}
 }
+
+socket.on("drawBrush", function(type, width, col, click, pX, pY, cX, cY, f) {
+  if (click) {
+    ctx.fillStyle = col;
+    if (eraserTool) {
+      ctx.fillStyle = "#ffffff";
+    }
+    ctx.beginPath();
+    ctx.arc(pX, pY, width/2, 0, 2*Math.PI, false);
+    ctx.fill();
+    ctx.closePath();
+  }
+  else if (f) {
+    ctx.beginPath();
+    ctx.moveTo(pX, pY);
+  	ctx.lineTo(cX, cY);
+  	ctx.lineJoin = ctx.lineCap = 'round';
+    ctx.strokeStyle = col;
+    if (type == "eraser") {
+      ctx.strokeStyle = "#ffffff";
+    }
+    ctx.lineWidth = width;
+    ctx.stroke();
+    ctx.closePath();
+  }
+});
+
+socket.on("drawRect", function(col, sX, sY, mX, mY) {
+  console.log("drawRect!");
+  console.log("color: " + col + " sX: " + sX + " mX: " + mX);
+  ctx.beginPath();
+  ctx.fillStyle = col;
+  ctx.rect(sX,sY,mX-sX,mY-sY);
+  ctx.fill();
+  ctx.closePath();
+});
+
+socket.on("drawCircle", function(col, sX, sY, mX, mY) {
+  console.log("drawCircle!");
+  ctx.fillStyle = col;
+  ctx.beginPath();
+  var midX = (sX+mX)/2;
+  var midY = (sY+mY)/2;
+  var radius = (sX-mX)/2;
+  if (radius < 0) {
+    radius *= -1;
+  }
+  ctx.arc(midX, midY, radius, 0, 2*Math.PI, false);
+  ctx.fill();
+  ctx.closePath();
+});
+
+socket.on("clearCanvas", function() {
+  ctx.clearRect(0, 0, 600, 500);
+});
 
 function changeColor(newColor, colorName) {
 	currColor.src = "img/" + colorName + ".png";
@@ -237,15 +258,27 @@ function changeColor(newColor, colorName) {
 
 function changeBrushSize(newSize) {
 	lineWidth = newSize;
-	if (brushTool) {
+	if (brushTool || eraserTool) {
 		if (lineWidth == 30) {
-  			canvas.style.cursor = cursorLargeBrush;
+      if (brushTool)
+  		  canvas.style.cursor = cursorLargeBrush;
+      $("#small-brush").attr('src', 'img/icon-smallbrush.png');
+      $("#med-brush").attr('src', 'img/icon-medbrush.png');
+      $("#large-brush").attr('src', 'img/icon-largebrush (1).png');
 		}
 		else if (lineWidth == 15) {
-			canvas.style.cursor = cursorMedBrush;
+      if (brushTool)
+			   canvas.style.cursor = cursorMedBrush;
+      $("#small-brush").attr('src', 'img/icon-smallbrush.png');
+      $("#med-brush").attr('src', 'img/icon-medbrush (1).png');
+      $("#large-brush").attr('src', 'img/icon-largebrush.png');
 		}
 		else if (lineWidth == 8) {
-			canvas.style.cursor = cursorSmallBrush;
+      if (brushTool)
+			   canvas.style.cursor = cursorSmallBrush;
+      $("#small-brush").attr('src', 'img/icon-smallbrush (1).png');
+      $("#med-brush").attr('src', 'img/icon-medbrush.png');
+      $("#large-brush").attr('src', 'img/icon-largebrush.png');
 		}
 	}
 }
@@ -264,6 +297,7 @@ socket.on("pickingWord", function(drawerName) {
 });
 
 socket.on("needMorePlayers", function(){
+  displayOverlayToggle();
   $('#sessionUpdateText').empty();
   $('#sessionUpdateText').append("<h2>Waiting for another player! <br> Hold tight!</h2>");
 });
@@ -351,6 +385,10 @@ socket.on("displayScoreList", function(array, winner, gameOver) {
   $('#sessionUpdateText').append(playerEntries);
 });
 
+socket.on("toggleOverlayForUser", function(){
+  displayOverlayToggle();
+});
+
 function displayOverlayToggle() {
   $("#sessionUpdateDisplay").toggle();
   if ($("#sessionUpdateDisplay").css("display") === "flex") {
@@ -362,7 +400,7 @@ function displayOverlayToggle() {
   if ($("#canvas").css("position") === "absolute") {
     $("#canvas").css("position", "relative");
   }
-  else if   ($("#canvas").css("position") === "relative") {
+  else if ($("#canvas").css("position") === "relative") {
     $("#canvas").css("position", "absolute");
   }
 }
@@ -454,7 +492,7 @@ function startUp(){
 
 	// clearing canvas
 	$("#clear-canvas").click(function() {
-		ctx.clearRect(0, 0, 600, 500);
+		socket.emit("clearDraw");
 	});
 
 	// color changing clicks
