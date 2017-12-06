@@ -1,0 +1,75 @@
+.center {
+	width: 100%;
+	height: 100%;
+	min-width: 880px;
+	display: flex;
+	flex-direction: column;
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+ #voteHeader{
+  position: absolute;
+}
+
+#voteInfo {
+  margin-top: 95px;
+  text-align: center;
+  color: #4e4d4d;
+  font-weight: bold;
+}
+
+#voteInfo p {
+  background: white;
+  width: 600px;
+  margin: auto;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+#votingWordsTable {
+  margin: auto;
+  border-spacing: 0 8px;
+  width: 600px;
+}
+
+#votingWordsTable tr {
+  background: white;
+}
+
+#votingWordsTable td {
+  padding: 20px;
+  color: #4e4d4d;
+}
+
+#votingWordsTable tr td:nth-child(1) {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  width: 3%;
+  padding-right: 5px;
+  padding-left: 30px;
+}
+#votingWordsTable tr td:nth-child(2) {
+  font-size: 25px;
+  width: 50px;
+	font-family: 'Caveat Brush', cursive;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+#votingWordsTable tr td:nth-child(3) {
+  border-bottom-right-radius: 10px;
+  border-top-right-radius: 10px;
+  text-transform: uppercase;
+  text-align: center;
+  font-weight: bold;
+  font-size: 25px;
+  padding-right: 70px;
+}
+
+.voteClick {
+  width:25px;
+  height: 25px;
+  display: block;
+}
