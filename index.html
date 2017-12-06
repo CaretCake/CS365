@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 
 <html lang="en">
+	<img src="img/DoodleBackground2.jpg" style="display: none">
+
 	<head>
 		<meta charset="utf-8">
 		<title>Scribble Doodle Doo</title>
@@ -20,8 +22,8 @@
 						<p id="loginError"></p>
 					</div>
 					<div id="boxfoot">
-						<a href="vote.html"><button type="button" class="button-background" id="goToWordVote">Vote On Words!</button></a>
-						<button type="button" class="button-background" id="login">Login</button>
+						<a href="vote.html"><button type="button" class="button-background button-height" id="goToWordVote">Vote On Words!</button></a>
+						<button type="button" class="button-background button-height" id="login">Login</button>
 					</div>
 				</div>
 			</div>
@@ -46,12 +48,12 @@
 				<div class="background" id="gameStatusBar">
 					<div class="timer">
 						<img src="img/icon-timer.png" height="55" width="55" class="timer-icon">
-						<div class="text" id="timerText">90</div>
+						<div class="text numbers" id="timerText">90</div>
 					</div>
 					<div id="currentWord">
 					</div>
-					<div id="gameRound">
-						<p>Round 0 of 0</p>
+					<div class="numbers" id="gameRound">
+						<p>Round 0 of 10</p>
 					</div>
 				</div>
 
@@ -76,7 +78,7 @@
 							</div>
 						</div>
 
-						<div class="toolBar">
+						<div class="toolBar" id="toolBar">
 							<img src="img/black.png" alt="current color" height="40" width="40" class="border no-selection" id="current-color">
 							<table class="border">
 								<tr>
