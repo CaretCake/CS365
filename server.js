@@ -1,5 +1,5 @@
-//var mongoClient = require("mongodb").MongoClient;
-//var ObjectId = require("mongodb").ObjectId;
+var mongoClient = require("mongodb").MongoClient;
+var ObjectId = require("mongodb").ObjectId;
 
 var express = require("express");
 var app = express();
@@ -20,8 +20,8 @@ var allSockets = [];
 var allSocketsLoggedIn = [];
 var playerSockets = [];
 var threeWords = [];
-var words = ["football", "needle", "swing", "flower", "cookie", "ghost", "jellyfish", "lollipop", "hockey", "treasure"];
-var votingWords = [{word: "mario", points: 30}, {word: "sword", points: 48}, {word: "sunglasses", points: -3}, {word: "helicopter", points: 36}, {word: "computer", points: 44}, {word: "rollercoaster", points: 27}, {word: "dragon", points: 34}, {word: "lightbulb", points: -19}, {word: "bone", points: 3}, {word: "lightsaber", points: 28}, {word: "dinosaur", points: 40}, {word: "monster", points: 26}, {word: "zombie", points: 21}, {word: "turtle", points: -29}, {word: "GLaDOS", points: 12}];
+var words = [];
+var votingWordsArr = [];
 var votekickCount = 0;
 var sessionTime = 90;
 var roundNumber = 1;
@@ -39,27 +39,9 @@ var lastInArray = false;
 var displayActive = false;
 var voteKick = false;
 
-
-/*
-mongoClient.connect("mongodb://localhost:27017/scribbleGame", function(err, database) {
-	if(err) {
-		console.log("There was a problem connecting to the database.");
-		throw err;
-	}
-	else {
-		console.log("Connected to Mongo.");
-		db = database;
-	}
-});
-function updateClientGUIs() {
-db.collection("words").find({})
-	if(err == null)
-}
-*/
-
 function randomElementIn(theArray) {
 	var i = Math.floor(theArray.length * Math.random());
-	return theArray[i];
+	return theArray[i].word;
 }
 
 function getDrawerIndex(){
@@ -71,6 +53,7 @@ function getDrawerIndex(){
 }
 
 function getThreeWords(){
+	updateWordArrays();
 	while(threeWords.length > 0)
 		threeWords.pop();
 	threeWords.push(randomElementIn(words));
@@ -81,6 +64,88 @@ function getThreeWords(){
 	while(threeWords[2] == threeWords[0] || threeWords[2] == threeWords[1])
 		threeWords[2] = randomElementIn(words);
 		return threeWords;
+}
+
+function emitWords(socket, clientMessage){
+	var tempVoting = [];
+	for (var i = 0; i < votingWordsArr.length; i++) {
+		tempVoting[i] = votingWordsArr[i];
+	}
+	tempVoting.sort(function(a, b){return b.points - a.points});
+	socket.emit("displayVotingWords", tempVoting);
+	if(clientMessage) {
+		socket.emit("submissionFeedback", "Word added! Submit another?");
+	}
+}
+
+function updateWordArrays() {
+	db.collection("votingWords").find({}).toArray(function(erro, docs){
+		votingWordsArr.length = 0;
+		votingWordsArr = docs;
+		if (erro != null) {
+			console.log("There was an issue updating the votingWordsArr from the database.");
+		}
+	});
+	db.collection("gameWords").find({}).toArray(function(erro, docs){
+		words.length = 0;
+		words = docs;
+		if (erro != null) {
+			console.log("There was an issue updating the gameWords from the database.");
+		}
+	});
+}
+
+function checkWord(socket, err, docs, incOrDec, votingWord) {
+		var points = docs;
+		if(err) {
+			console.log("There was an issue getting the points for " + votingWord + ".");
+		}
+		else {
+				if(incOrDec) {
+					if(points >= 50) {
+						db.collection("votingWords").remove({ "word": votingWord}, true,  function() { updateWordArrays(); emitWords(socket, false); });
+						db.collection("gameWords").insertOne({ "word": votingWord, "length": votingWord.length}, function() { updateWordArrays(); emitWords(socket, false); });
+					}
+					else {
+						db.collection("votingWords").findOneAndUpdate(
+							{ "word": votingWord },
+							{ "$inc": { "points": 1 } },
+							function(err, doc){
+								if (err != null) {
+									console.log("There was an error when updating points on " + votingWord + ".");
+									console.log(err);
+								}
+								else if (err == null) {
+								}
+							}
+						);
+					}
+					updateWordArrays();
+				}
+				else if(!incOrDec) {
+					if(points <= -50) {
+						db.collection("votingWords").remove({ "word": votingWord}, true, function() { updateWordArrays(); emitWords(socket, false); });
+					}
+					else {
+						db.collection("votingWords").findOneAndUpdate(
+							{ "word": votingWord },
+							{ "$inc": { "points": -1 } },
+							{upsert: true},
+							function(err, doc){
+								if (err != null) {
+									console.log("There was an error when updating points on " + votingWord + ".");
+									console.log(err);
+								}
+								else if (err == null) {
+									updateWordArrays();
+								}
+							}
+						);
+				}
+			}
+			updateWordArrays();
+			var displayVW = setTimeout(function() { emitWords(socket, false); }, 100);
+	}
 }
 
 function reset(){
@@ -291,6 +356,7 @@ io.on("connection", function(socket) {
 	allSockets.push(socket);
 	allSocketsLoggedIn.push(false);
 	loggedIn = false;
+	updateWordArrays();
 
 	socket.on("disconnect", function() {
 		console.log("disconnection made");
@@ -322,7 +388,6 @@ io.on("connection", function(socket) {
 						roundNumber = 10;
 						leftDrawerIndex = 0;
 						displayEveryoneLeftGame();
-//						reset();
 					}
 				}
 				else if(!drawerLeft && players.length == 1){
@@ -512,53 +577,29 @@ io.on("connection", function(socket) {
 	});
 
 	socket.on("getVotingWords", function(){
+		updateWordArrays();
 		var tempVoting = [];
- 		for (var i = 0; i < votingWords.length; i++) {
- 			tempVoting[i] = votingWords[i];
+ 		for (var i = 0; i < votingWordsArr.length; i++) {
+ 			tempVoting[i] = votingWordsArr[i];
  		}
  		tempVoting.sort(function(a, b){return b.points - a.points});
  		socket.emit("displayVotingWords", tempVoting);
 	});
 
 	socket.on("voteWord", function(votingWord, incOrDec) {
-		var voteIndex;
-		for (var i = 0; i < votingWords.length; i++) {
-			if (votingWords[i].word == votingWord) {
-				if(incOrDec) {
-					votingWords[i].points++;
-					if(votingWords[i].points >= 50) {
- 						words.push(votingWords[i].word);
- 						votingWords.splice(i, 1);
- 					}
-				}
-				else if(!incOrDec) {
-					votingWords[i].points--;
-					if(votingWords[i].points <= -50) {
- 						votingWords.splice(i, 1);
- 					}
-				}
-			}
-		}
-		var tempVoting = [];
- 		for (var i = 0; i < votingWords.length; i++) {
- 			tempVoting[i] = votingWords[i];
- 		}
- 		tempVoting.sort(function(a, b){return b.points - a.points});
- 		socket.emit("displayVotingWords", tempVoting);
+		updateWordArrays();
+		db.collection("votingWords").distinct("points", { "word": votingWord }, function(err, docs){ checkWord(socket, err, docs, incOrDec, votingWord); });
 	});
 
 	socket.on("submitWord", function(newWord){
-	 	var isNumeric = (!isNaN(parseFloat(newWord)) && isFinite(newWord));
-	 	console.log(isNumeric);
+		var isNumeric = (!isNaN(parseFloat(newWord)) && isFinite(newWord));
 	 	var hasSpaces = (newWord.indexOf(' ') >= 0);
-	 	console.log(hasSpaces);
 	 	var inVotingorGame = false;
-	 	for (var i = 0; i < votingWords.length; i++) {
-	 		if (votingWords[i].word == newWord){
+	 	for (var i = 0; i < votingWordsArr.length; i++) {
+	 		if (votingWordsArr[i].word == newWord){
 	 			inVotingorGame = true;
 	 		}
 	 	}
-	 	console.log(inVotingorGame);
 	 	for (var i = 0; i < words.length; i++) {
 	 		if (words[i] == newWord){
 	 			inVotingorGame = true;
@@ -574,18 +615,22 @@ io.on("connection", function(socket) {
 	 		socket.emit("submissionFeedback", "We've already got that one! Try another?");
 	 	}
 	 	else {
-	 		votingWords.push({ word: newWord, points: 1 });
-	 		var tempVoting = [];
-	 		for (var i = 0; i < votingWords.length; i++) {
-	 			tempVoting[i] = votingWords[i];
-	 		}
-	 		tempVoting.sort(function(a, b){return b.points - a.points});
-	 		socket.emit("displayVotingWords", tempVoting);
-	 		socket.emit("submissionFeedback", "Word added! Submit another?");
+			db.collection("votingWords").insertOne({ "word": newWord, "length": newWord.length, "points": 1}, function() { updateWordArrays(); });
+			var displayV = setTimeout(function() { emitWords(socket, true); }, 100);
 	 	}
 	 });
 });
 
 server.listen(80, function() {
 	console.log("Server is listening");
+	mongoClient.connect("mongodb://localhost:27017/scribbleDoodleDoo", function(err, database){
+		if(err) {
+			console.log("There was an issue connecting to the database.");
+		}
+		else {
+			console.log("Connected to Mongo!");
+			db = database;
+			updateWordArrays();
+		}
+	})
 });
