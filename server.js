@@ -196,8 +196,10 @@ function reset(){
 	drawerLeft = false;
 
 	//assign new drawer and put in room
-	players[newDrawer].drawer = true;
-	players[newDrawer].guessed = true;
+	if(gameRunning){
+		players[newDrawer].drawer = true;
+		players[newDrawer].guessed = true;
+	}
 	let socket = io.sockets.connected[players[newDrawer].socketID];
 	socket.join('drawer');
 	socket.leave('guessers');
