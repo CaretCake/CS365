@@ -1,6 +1,7 @@
 var socket = io();
 
 socket.on("displayVotingWords", function(dataFromServer) {
+  // Fills votingWordsTable for client
   $("#votingWordsTable").empty();
   var votingTable = "";
   votingTable += "<tr id='submitRow'><td><img src='img/add.png' id='add' class='no-selection'></td><td> </td>";
@@ -23,6 +24,7 @@ socket.on("displayVotingWords", function(dataFromServer) {
 });
 
 function createSubmissionHandlers() {
+  //Adds handlers for submitting a new word
   console.log("sub handlers created");
   $("#addButton").click(submitWord);
   $("#wordBox").keypress(function(event){
@@ -34,20 +36,25 @@ function createSubmissionHandlers() {
 }
 
 function createButtons(currentWord, index) {
+  //Creates button handlers for upvote/downvote
   $("#upvote" + index).click(function() {
+    console.log(currentWord);
     socket.emit("voteWord", currentWord, true);
   });
   $("#downvote" + index).click(function() {
+    console.log(currentWord);
     socket.emit("voteWord", currentWord, false);
   });
 }
 
 function submitWord() {
+  //Submits word in #wordBox input
   socket.emit("submitWord", $("#wordBox").val());
   $("#wordBox").val("");
 };
 
 socket.on("submissionFeedback", function(message){
+  //Displays feedback from server to user on whether or not submitted word was accepted
   $("#wordBox").attr("placeholder", message);
 });
 
