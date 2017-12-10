@@ -181,7 +181,7 @@ function findxy(res, e) {
 socket.on("drawBrush", function(type, width, col, click, pX, pY, cX, cY, f) {
   if (click) {
     ctx.fillStyle = col;
-    if (eraserTool) {
+    if (type == "eraser") {
       ctx.fillStyle = "#ffffff";
     }
     ctx.beginPath();
