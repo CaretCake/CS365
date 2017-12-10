@@ -9,14 +9,6 @@ var startY;
 var idleTime;
 var idleStatus;
 
-//TEMPORARY VARIABLES FOR TESTING
-/*
-var playerListScore = [];
-playerListScore[0] = {player: 'Jack', score: 303330}
-playerListScore[1] = {player: 'Pumpkin', score: 202}
-playerListScore[2] = {player: 'Enthuse', score: 10};
-*/
-
 var brushTool;
 var rectTool;
 var circleTool;
@@ -28,7 +20,6 @@ var cursorLargeBrush = "url(img/cursor-large-draw.png) 15 15, auto";
 var cursorCircle = "url(img/cursor-circle.png) 0 10, auto";
 var cursorRect = "url(img/cursor-rect.png) 0 10, auto";
 var cursorEraser = "url(img/cursor-eraser.png) 0 34, auto";
-
 
 var canvas, ctx, flag = false,
     prevX = 0,
@@ -79,8 +70,8 @@ function sanitizeForHTML(stringToConvert) {
 	return stringToConvert;
 }
 
-
 socket.on("updateUsers", function(players){
+  console.log("Updated Users");
 	$("#userList").empty();
 	var th = $("<th colspan='3'>Players</th>");
 	$("#userList").append(th);
@@ -112,15 +103,6 @@ function sendChatToServer() {
 	$("#chatText").val("");
 	$("#chatText").focus();
 }
-
-/*function adjustCanvasHeight () {
-	var canvasWidth = $(".canvas").width();
-	$(".canvas").css("height", canvasWidth);
-	console.log(canvasWidth);
-	console.log("height change!");
-	console.log(canvas.css(width));
-}*/
-
 
 function findxy(res, e) {
   if (brushTool || eraserTool) {
@@ -291,20 +273,31 @@ function setToolsFalse() {
 }
 
 socket.on("pickingWord", function(drawerName) {
-  displayOverlayToggle();
   $('#sessionUpdateText').empty();
   $('#sessionUpdateText').append("<h2>" + drawerName + " is picking a word!</h2>");
 });
 
 socket.on("needMorePlayers", function(){
-  displayOverlayToggle();
   $('#sessionUpdateText').empty();
   $('#sessionUpdateText').append("<h2>Waiting for another player! <br> Hold tight!</h2>");
 });
 
+socket.on("drawerHasLeft", function(){
+  $('#sessionUpdateText').empty();
+  $('#sessionUpdateText').append("<h2>The drawer has left! <br> A new round is starting!</h2>");
+});
+
+socket.on("everyoneLeftGame", function(){
+  $('#sessionUpdateText').empty();
+  $('#sessionUpdateText').append("<h2>Looks like everyone left! <br> The game is over!</h2>");
+});
+
+socket.on("displayActive", function(){
+  $('#sessionUpdateText').empty();
+  $('#sessionUpdateText').append("<h2>The next round is about to start! <br> Hold tight!</h2>");
+});
+
 socket.on("displayWords", function(threeWords) {
-  displayOverlayToggle();
-  console.log("Hello");
   idleStatus = true;
   $('#sessionUpdateText').empty();
   var wordButtons = "<h2>Pick a Word!</h2><div id='wordButtonsDiv'>";
@@ -337,25 +330,18 @@ socket.on("disableCanvas", function(){
   $("#canvas").css("pointer-events", "none");
 });
 
-socket.on("displayWordToAll", function(setWord, sessionEnding){
-  if(!sessionEnding)
-    displayOverlayToggle();
+socket.on("displayWordToGuessers", function(setWord){
+  $("#chatText").focus();
   $("#currentWord").empty();
   var table = $("<table></table>");
   var tr = $("<tr></tr>");
-  for(var i = 0; i < setWord.length; i++){
-    if(sessionEnding)
-     tr.append("<td class='letterMarkers'>" + setWord[i] + "</td>");
-    else
+  for(var i = 0; i < setWord.length; i++)
       tr.append("<td class='letterMarkers'></td>");
-   }
    table.append(tr);
    $("#currentWord").append(table);
  });
 
- socket.on("displayWordToDrawer", function(setWord){
-   displayOverlayToggle();
-   console.log("Display to drawer");
+ socket.on("displayCompleteWord", function(setWord){
    $("#currentWord").empty();
    var table = $("<table></table>");
    var tr = $("<tr></tr>");
@@ -371,8 +357,6 @@ socket.on("toggleVoteKick", function(){
 });
 
 socket.on("displayScoreList", function(array, winner, gameOver) {
-  console.log("display clientside");
-  displayOverlayToggle();
   $('#sessionUpdateText').empty();
   if(gameOver){
     $('#sessionUpdateText').append('<h1>Final Scores</h1>');
@@ -398,25 +382,13 @@ socket.on("displayScoreList", function(array, winner, gameOver) {
   $('#sessionUpdateText').append(playerEntries);
 });
 
-socket.on("toggleOverlayForUser", function(){
-  displayOverlayToggle();
+socket.on("displayOverlayToggle", function(toToggle, displayProp, positionProp){
+  console.log("displaytoggle client side");
+  if(toToggle)
+    $("#sessionUpdateDisplay").toggle();
+  $("#sessionUpdateDisplay").css("display", displayProp);
+  $("#canvas").css("position", positionProp);
 });
-
-function displayOverlayToggle() {
-  $("#sessionUpdateDisplay").toggle();
-  if ($("#sessionUpdateDisplay").css("display") === "flex") {
-    $("#sessionUpdateDisplay").css("display", "none");
-  }
-  else if ($("#sessionUpdateDisplay").css("display") === "none") {
-    $("#sessionUpdateDisplay").css("display", "flex");
-  }
-  if ($("#canvas").css("position") === "absolute") {
-    $("#canvas").css("position", "relative");
-  }
-  else if ($("#canvas").css("position") === "relative") {
-    $("#canvas").css("position", "absolute");
-  }
-}
 
 socket.on("startSessionTimer", function(sessionTime) {
   $('#timerText').empty();
@@ -438,8 +410,6 @@ function isIdle() {
   }
 }
 
-//socket.on("reset", function());
-
 socket.on("updateRound", function(roundNumber){
   $("#gameRound").empty();
   $("#gameRound").append("Round " + roundNumber + " of 10");
@@ -456,7 +426,6 @@ function startUp(){
 	h = 500;
 	offset = $(canvas).offset();
   changeBrushSize(lineWidth);
-
 
 	mouseIsDown = false;
 
@@ -561,7 +530,6 @@ function startUp(){
 	// brush size changing clicks
 	$("#small-brush").click(function() {
 		changeBrushSize(8);
-
 	});
 	$("#med-brush").click(function() {
 		changeBrushSize(15);
@@ -610,15 +578,7 @@ function startUp(){
   $(this).keypress(function (e) {
       idleTime = 0;
   });
-  //displayOverlayToggle();
 	loadLogin();
-  //socket.emit("getThreeWords");
-
-  //displayWords("treasure", "pie", "award");
-  //displayScoreList(playerListScore);
-  //setInterval(startSessionTimer, 1000);
 }
-
-
 
 $(startUp);
