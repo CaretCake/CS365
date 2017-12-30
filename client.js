@@ -35,7 +35,7 @@ function loadLogin(){
 	var hei = $(window).height();
 
 	$("#loginOverlay").css("height", hei + 'px');
-	$("#box").css("left", (wid/2)-(600 * .5)+"px");
+	$("#box").css("left", (wid/2)-(600 * 0.5)+"px");
 }
 
 socket.on("loginBad", function(errorMessage){
@@ -83,7 +83,7 @@ socket.on("updateUsers", function(players){
 		if(players[i].drawer) {
       tr.append("<td class='drawer' rowspan='2'><img src='img/icon-draw.png' class='pencilCheck'></td>");
     }
-    else if(players[i].guessed && players[i].drawer == false) {
+    else if(players[i].guessed && players[i].drawer === false) {
     	tr.append("<td class='guessed' rowspan='2'><img src='img/check-mark.png' class='pencilCheck'></td>");
     }
     else {
@@ -105,6 +105,8 @@ function sendChatToServer() {
 }
 
 function findxy(res, e) {
+  var mouseX;
+  var mouseY;
   if (brushTool || eraserTool) {
     var type;
     var click = false;
@@ -114,7 +116,7 @@ function findxy(res, e) {
     else if (eraserTool) {
       type = "eraser";
     }
-    if (res == 'down') {
+    if (res === 'down') {
 			changeBrushSize(lineWidth);
 			prevX = currX;
 			prevY = currY;
@@ -123,10 +125,10 @@ function findxy(res, e) {
       click = false;
 			flag = true;
 		}
-		if (res == 'up' || res == "out") {
+		if (res === 'up' || res === "out") {
       var upX = e.pageX - offset.left;
       var upY = e.pageY - offset.top;
-      if (res == 'up' && currX == upX && currY == upY) {
+      if (res === 'up' && currX === upX && currY === upY) {
         click = true;
         console.log("click registered!");
         socket.emit("brushDraw", type, lineWidth, color, click, upX, upY, currX, currY, flag);
@@ -136,7 +138,7 @@ function findxy(res, e) {
       }
 			flag = false;
 		}
-		if (res == 'move') {
+		if (res === 'move') {
       changeBrushSize(lineWidth);
       console.log(flag);
 			if (flag) {
@@ -150,13 +152,13 @@ function findxy(res, e) {
 	}
 
 	if (rectTool) {
-		if(mouseIsDown && res == 'up'){
+		if(mouseIsDown && res === 'up'){
 		    mouseIsDown = false;
-		    var mouseX = e.pageX - offset.left;
-		    var mouseY = e.pageY - offset.top;
+		    mouseX = e.pageX - offset.left;
+		    mouseY = e.pageY - offset.top;
         socket.emit("rectDraw", color, startX, startY, mouseX, mouseY);
 		}
-		else if (res == 'down') {
+		else if (res === 'down') {
 		    mouseIsDown = true;
 		    startX = e.pageX - offset.left;
 		    startY = e.pageY - offset.top;
@@ -164,13 +166,13 @@ function findxy(res, e) {
 	}
 
 	if (circleTool) {
-			if(mouseIsDown && res == 'up'){
+			if(mouseIsDown && res === 'up'){
 		    mouseIsDown = false;
-		    var mouseX = e.pageX - offset.left;
-		    var mouseY = e.pageY - offset.top;
+		    mouseX = e.pageX - offset.left;
+		    mouseY = e.pageY - offset.top;
 		    socket.emit("circleDraw", color, startX, startY, mouseX, mouseY);
 			}
-			else if (res == 'down') {
+			else if (res === 'down') {
 			    mouseIsDown = true;
 			    startX = e.pageX - offset.left;
 			    startY = e.pageY - offset.top;
@@ -181,7 +183,7 @@ function findxy(res, e) {
 socket.on("drawBrush", function(type, width, col, click, pX, pY, cX, cY, f) {
   if (click) {
     ctx.fillStyle = col;
-    if (type == "eraser") {
+    if (type === "eraser") {
       ctx.fillStyle = "#ffffff";
     }
     ctx.beginPath();
@@ -195,7 +197,7 @@ socket.on("drawBrush", function(type, width, col, click, pX, pY, cX, cY, f) {
   	ctx.lineTo(cX, cY);
   	ctx.lineJoin = ctx.lineCap = 'round';
     ctx.strokeStyle = col;
-    if (type == "eraser") {
+    if (type === "eraser") {
       ctx.strokeStyle = "#ffffff";
     }
     ctx.lineWidth = width;
@@ -241,21 +243,21 @@ function changeColor(newColor, colorName) {
 function changeBrushSize(newSize) {
 	lineWidth = newSize;
 	if (brushTool || eraserTool) {
-		if (lineWidth == 30) {
+		if (lineWidth === 30) {
       if (brushTool)
   		  canvas.style.cursor = cursorLargeBrush;
       $("#small-brush").attr('src', 'img/icon-smallbrush.png');
       $("#med-brush").attr('src', 'img/icon-medbrush.png');
       $("#large-brush").attr('src', 'img/icon-largebrush (1).png');
 		}
-		else if (lineWidth == 15) {
+		else if (lineWidth === 15) {
       if (brushTool)
 			   canvas.style.cursor = cursorMedBrush;
       $("#small-brush").attr('src', 'img/icon-smallbrush.png');
       $("#med-brush").attr('src', 'img/icon-medbrush (1).png');
       $("#large-brush").attr('src', 'img/icon-largebrush.png');
 		}
-		else if (lineWidth == 8) {
+		else if (lineWidth === 8) {
       if (brushTool)
 			   canvas.style.cursor = cursorSmallBrush;
       $("#small-brush").attr('src', 'img/icon-smallbrush (1).png');
@@ -357,27 +359,28 @@ socket.on("toggleVoteKick", function(){
 });
 
 socket.on("displayScoreList", function(array, winner, gameOver) {
+  var playerEntries;
   $('#sessionUpdateText').empty();
   if(gameOver){
     $('#sessionUpdateText').append('<h1>Final Scores</h1>');
     $('#sessionUpdateText').append('<h2>' + winner.name + ' has won the game!</h2>');
-    var playerEntries = "<ol>";
+    playerEntries = "<ol>";
     for (var i = 0; i < array.length; i++) {
       playerEntries += "<li><span class='numbers' id='rankSpan'>" + array[i].rank + ". </span><span class='numbers' id='nameSpan'>";
       playerEntries += array[i].name + "</span><span class='numbers' id='scoreSpan'>" + array[i].score;
       playerEntries += "</span></li>";
     }
-    playerEntries += "</ol>"
+    playerEntries += "</ol>";
   }
   else {
     $('#sessionUpdateText').append('<h2>Scores</h2>');
-    var playerEntries = "<ol>";
+    playerEntries = "<ol>";
     for (var i = 0; i < array.length; i++) {
       playerEntries += "<li><span class='numbers' id='rankSpan'>" + (i+1) + ". </span><span class='numbers' id='nameSpan'>";
       playerEntries += array[i].name + "</span><span class='numbers' id='scoreSpan'>" + array[i].score;
       playerEntries += "</span></li>";
     }
-    playerEntries += "</ol>"
+    playerEntries += "</ol>";
   }
   $('#sessionUpdateText').append(playerEntries);
 });
@@ -554,7 +557,7 @@ function startUp(){
 		socket.emit("login", $("#userName").val());
 	});
 	$("#userName").keypress(function(event) {
-		if (event.which == 13) {
+		if (event.which === 13) {
 			socket.emit("login", $("#userName").val());
 			event.preventDefault();
 		}
@@ -562,7 +565,7 @@ function startUp(){
 
 	$("#chatButton").click(sendChatToServer);
 	$("#chatText").keypress(function(event) {
-		if (event.which == 13) {
+		if (event.which === 13) {
 			sendChatToServer();
 			event.preventDefault();
 		}
