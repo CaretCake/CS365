@@ -23,6 +23,7 @@ var threeWords = [];
 var words = [];
 var votingWordsArr = [];
 var votekickCount = 0;
+var textString;
 var sessionTime = 90;
 var roundNumber = 1;
 var drawerSessionScore = 0;
@@ -46,7 +47,7 @@ function randomElementIn(theArray) {
 
 function getDrawerIndex(){
 	for(var i = 0; i < players.length; i++){
-		if(players[i].drawer == true)
+		if(players[i].drawer === true)
 			drawerIndex = i;
 	}
 	return drawerIndex;
@@ -58,10 +59,10 @@ function getThreeWords(){
 		threeWords.pop();
 	threeWords.push(randomElementIn(words));
 	threeWords.push(randomElementIn(words));
-	while(threeWords[0] == threeWords[1])
+	while(threeWords[0] === threeWords[1])
 		threeWords[1] = randomElementIn(words);
 	threeWords.push(randomElementIn(words));
-	while(threeWords[2] == threeWords[0] || threeWords[2] == threeWords[1])
+	while(threeWords[2] === threeWords[0] || threeWords[2] === threeWords[1])
 		threeWords[2] = randomElementIn(words);
 		return threeWords;
 }
@@ -115,7 +116,7 @@ function checkWord(socket, err, docs, incOrDec, votingWord) {
 									console.log("There was an error when updating points on " + votingWord + ".");
 									console.log(err);
 								}
-								else if (err == null) {
+								else if (err === null) {
 								}
 							}
 						);
@@ -136,7 +137,7 @@ function checkWord(socket, err, docs, incOrDec, votingWord) {
 									console.log("There was an error when updating points on " + votingWord + ".");
 									console.log(err);
 								}
-								else if (err == null) {
+								else if (err === null) {
 									updateWordArrays();
 								}
 							}
@@ -153,8 +154,8 @@ function reset(){
 	var newDrawer = 0;
 	//update gamescores and gamesranks
 	updateGameScores();
-	//if roundNumber == 10 then all gameranks set to 1 and scores to 0
-	if(roundNumber == 10){
+	//if roundNumber === 10 then all gameranks set to 1 and scores to 0
+	if(roundNumber === 10){
 		for(var i = 0; i < players.length; i++){
 			players[i].score = 0;
 		}
@@ -180,7 +181,7 @@ function reset(){
 		newDrawer = leftDrawerIndex;
 	else{
 		drawerIndex = getDrawerIndex();
-		if(drawerIndex == players.length - 1)
+		if(drawerIndex === players.length - 1)
 			newDrawer = 0;
 		else
 			newDrawer = (drawerIndex+1);
@@ -211,8 +212,8 @@ function reset(){
 	sessionTime = 90;
 	io.emit("startSessionTimer", sessionTime);
 	//update round number if every player has drawn
-	if(newDrawer == 0){
-		if(roundNumber == 10)
+	if(newDrawer === 0){
+		if(roundNumber === 10)
 			roundNumber = 0;
 		else
 			roundNumber++;
@@ -238,13 +239,13 @@ function ifSessionOver(){
 	if(loggedIn){
 		if(players.length >= 1){
 			for(var i = 0; i < players.length; i++){
-				if(players[i].guessed == false)
+				if(players[i].guessed === false)
 					guesserCheck = false;
 			}
 			drawerIndex = getDrawerIndex();
 			if(guesserCheck)
 				sessionOver = true;
-			if(sessionTime == 0)
+			if(sessionTime === 0)
 				sessionOver = true;
 			if(sessionOver){
 				gameRunning = false;
@@ -279,7 +280,7 @@ function displayCanvasScores(drawerIndex){
 	io.emit("displayCompleteWord", setWord);
 	clearCanv();
 	for(var i = 0; i < players.length; i++){
-		if(players[i].guessed == false)
+		if(players[i].guessed === false)
 			sessionScores.push({name: players[i].name, score: 0});
 	}
 	sessionScores.push({name: players[drawerIndex].name, score: drawerSessionScore});
@@ -287,10 +288,10 @@ function displayCanvasScores(drawerIndex){
 	sessionTime = 0;
 	io.emit("startSessionTimer", sessionTime);
 	io.emit("displayOverlayToggle", true, "flex", "absolute");
-	if(roundNumber == 10 && getDrawerIndex() == players.length-1){
-		for(var i = 0; i < players.length; i++){
-			if(players[i].rank == 1)
-				var winner = players[i];
+	if(roundNumber === 10 && getDrawerIndex() === players.length-1){
+		for(var v = 0; i < players.length; v++){
+			if(players[v].rank === 1)
+				winner = players[v];
 		}
 		io.emit("displayScoreList", players, winner, true);
 	}
@@ -310,7 +311,7 @@ function startTimers(){
 function updateGameScores(){
 	for(var i = 0; i < players.length; i++){
 		for(var j = 0; j < sessionScores.length; j++){
-			if(players[i].name == sessionScores[j].name)
+			if(players[i].name === sessionScores[j].name)
 				players[i].score += sessionScores[j].score;
 		}
 	}
@@ -323,13 +324,13 @@ function updateGameRanks(){
 		gameScores.push(players[i]);
 	if(gameScores.length > 0)
 		gameScores.sort(function(a,b){return b.score-a.score});
-	for(var i = 0; i < players.length; i++){
+	for(var n = 0; i < players.length; n++){
 		for(var j = 0; j < gameScores.length; j++){
-			if(players[i].name == gameScores[j].name){
-				if(i > 0 && j > 0 && gameScores[j].score == gameScores[j-1].score)
-					players[i].rank = players[i-1].rank;
+			if(players[n].name === gameScores[j].name){
+				if(i > 0 && j > 0 && gameScores[j].score === gameScores[j-1].score)
+					players[n].rank = players[n-1].rank;
 				else
-					players[i].rank = (j + 1);
+					players[n].rank = (j + 1);
 			}
 		}
 	}
@@ -364,14 +365,14 @@ io.on("connection", function(socket) {
 		console.log("disconnection made");
 		var m = allSockets.indexOf(socket);
 		if(loggedIn){
-			if(allSocketsLoggedIn[m] == true){
+			if(allSocketsLoggedIn[m] === true){
 				var k = playerSockets.indexOf(socket);
-				if(k == getDrawerIndex()){
+				if(k === getDrawerIndex()){
 					drawerLeft = true;
 					leftDrawerIndex = k;
 					socket.leave('drawer');
 					socket.leave('guessedWord');
-					if(k == players.length - 1){
+					if(k === players.length - 1){
 						lastInArray = true;
 					}
 				}
@@ -385,21 +386,21 @@ io.on("connection", function(socket) {
 					gameRunning = false;
 					if(players.length > 1)
 						displayDrawerHasLeft();
-					else if(players.length == 1){
+					else if(players.length === 1){
 						gameRunning = false;
 						roundNumber = 10;
 						leftDrawerIndex = 0;
 						displayEveryoneLeftGame();
 					}
 				}
-				else if(!drawerLeft && players.length == 1){
+				else if(!drawerLeft && players.length === 1){
 						sessionCutOff();
 						drawerRemains = true;
 						gameRunning = false;
 						roundNumber = 10;
 						displayEveryoneLeftGame();
 				}
-				else if(players.length == 0){
+				else if(players.length === 0){
 					sessionCutOff();
 					gameRunning = false;
 					loggedIn = false;
@@ -431,7 +432,7 @@ io.on("connection", function(socket) {
 		playerSockets.push(socket);
 		var sessionid = socket.id;
 		socket.join("loggedIn");
-		if(playerSockets.length == 1){
+		if(playerSockets.length === 1){
 			players.push({name: username, score: 0, drawer: true, guessed: true, rank: 1, socketID: sessionid});
 			socket.join('drawer');
 			socket.join('guessedWord');
@@ -443,17 +444,17 @@ io.on("connection", function(socket) {
 		socket.emit("loginOk");
 		updateGameRanks();
 		io.emit("updateUsers", players);
-		if(players.length == 1){
+		if(players.length === 1){
 			socket.emit("displayOverlayToggle", true, "flex", "absolute");
 			socket.emit("needMorePlayers");
 		}
-		else if(players.length == 2){
+		else if(players.length === 2){
 			socket.emit("displayOverlayToggle", true, "flex", "absolute");
 			socket.emit("pickingWord", players[0].name);
 			io.in('drawer').emit("displayWords", getThreeWords());
 		}
 		else{
-			if(gameRunning == false){
+			if(gameRunning === false){
 				if(displayActive){
 					socket.emit("displayOverlayToggle", true, "flex", "absolute");
 					socket.emit("displayActive");
@@ -468,13 +469,13 @@ io.on("connection", function(socket) {
 		}
 
 		for (var i = 0; i < sessionDrawing.length; i++) {
-			if (sessionDrawing[i].t == "brush" || sessionDrawing[i].t == "eraser") {
+			if (sessionDrawing[i].t === "brush" || sessionDrawing[i].t === "eraser") {
 				socket.emit("drawBrush", sessionDrawing[i].t, sessionDrawing[i].w, sessionDrawing[i].col, sessionDrawing[i].cl, sessionDrawing[i].prevX, sessionDrawing[i].prevY, sessionDrawing[i].currX, sessionDrawing[i].currY, sessionDrawing[i].fl);
 			}
-			else if (sessionDrawing[i].t == "rect") {
+			else if (sessionDrawing[i].t === "rect") {
 				socket.emit("drawRect", sessionDrawing[i].col, sessionDrawing[i].prevX, sessionDrawing[i].prevY, sessionDrawing[i].currX, sessionDrawing[i].currY);
 			}
-			else if (sessionDrawing[i].t == "circle") {
+			else if (sessionDrawing[i].t === "circle") {
 				socket.emit("drawCircle", sessionDrawing[i].col, sessionDrawing[i].prevX, sessionDrawing[i].prevY, sessionDrawing[i].currX, sessionDrawing[i].currY);
 			}
 		}
@@ -482,8 +483,8 @@ io.on("connection", function(socket) {
 
 	socket.on("chat", function(textInput) {
 		var i = playerSockets.indexOf(socket);
-		if(players[i].guessed == true || players[i].drawer == true){
-			var textString = "**" + players[i].name + "**: " + textInput;
+		if(players[i].guessed === true || players[i].drawer === true){
+			textString = "**" + players[i].name + "**: " + textInput;
 			io.in('guessedWord').emit("sayAll", textString);
 		}
 		else{
@@ -492,12 +493,12 @@ io.on("connection", function(socket) {
 				drawerSessionScore += (10 + sessionTime);
 				players[i].guessed = true;
 				socket.join('guessedWord');
-				var textString = "****" + players[i].name + " has guessed the word!****";
+				textString = "****" + players[i].name + " has guessed the word!****";
 				io.emit("sayAll", textString);
 				io.emit("updateUsers", players);
 			}
 			else{
-				var textString = players[i].name + ": " + textInput;
+				textString = players[i].name + ": " + textInput;
 				io.emit("sayAll", textString);
 			}
 		}
@@ -506,21 +507,21 @@ io.on("connection", function(socket) {
 	socket.on("votekick", function(){
 		//var kickerIndex = allSockets.indexOf(socket);
 		votekickCount++;
-		if(players.length % 2 == 0){
-			if(players.length == 2){
-				var textString = "";
-				if(votekickCount == 1)
-					var votekick = true;
+		if(players.length % 2 === 0){
+			if(players.length === 2){
+				textString = "";
+				if(votekickCount === 1)
+					votekick = true;
 			}
 			else{
-				var textString = "**Vote kicking the drawer at " + votekickCount + "/" + (players.length/2 + 1) + " votes**";
-				if(votekickCount == (players.length/2 + 1))
+				textString = "**Vote kicking the drawer at " + votekickCount + "/" + (players.length/2 + 1) + " votes**";
+				if(votekickCount === (players.length/2 + 1))
 					votekick = true;
 			}
 		}
 		else{
-			var textString = "**Vote kicking the drawer at " + votekickCount + "/" + ((players.length + 1)/2) + " votes**";
-			if(votekickCount == ((players.length + 1)/2))
+			textString = "**Vote kicking the drawer at " + votekickCount + "/" + ((players.length + 1)/2) + " votes**";
+			if(votekickCount === ((players.length + 1)/2))
 				votekick = true;
 		}
 		io.emit("sayAll", textString);
@@ -598,12 +599,12 @@ io.on("connection", function(socket) {
 	 	var hasSpaces = (newWord.indexOf(' ') >= 0);
 	 	var inVotingorGame = false;
 	 	for (var i = 0; i < votingWordsArr.length; i++) {
-	 		if (votingWordsArr[i].word == newWord){
+	 		if (votingWordsArr[i].word === newWord){
 	 			inVotingorGame = true;
 	 		}
 	 	}
 	 	for (var i = 0; i < words.length; i++) {
-	 		if (words[i] == newWord){
+	 		if (words[i] === newWord){
 	 			inVotingorGame = true;
 	 		}
 	 	}
